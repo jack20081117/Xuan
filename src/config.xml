@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<config>
+    <string>
+        <black>
+            <x value="1">
+                <y value="2">
+                    <num value="19"></num>
+                </y>
+            </x>
+            <num value="19">
+                <x value="1" />
+                <y value="2" />
+            </num>
+        </black>
+        <white>
+        </white>
+    </string>
+</config>
