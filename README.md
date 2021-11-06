@@ -58,3 +58,46 @@ Python
 双方都同意计算胜负时，把所有的死棋去掉，各自算目数，目数=棋子数+围成的空数
 
 黑方须比白多6.5目以上才能获胜，否则白获胜。
+##围棋逻辑实现
+* 落子
+  * Xuan会先判断落子是否合法，即是否1≤x,y≤19。再判断该点是否处于打劫状态。
+  * `combine(x,y)`会尝试将当前落子点与上下左右四个方向匹配，若找到同色棋子，则会合并到棋串当中。
+    ```json5
+    //棋串数据结构：
+    {
+        "black":{
+                1:{
+                    2:{
+                        "num":19
+                    }
+                }
+        },
+        19:[{"x":1,"y":2}]
+    }
+    ```
+  即棋串按黑白二色区分，次级键为x,y坐标，最后则是这个棋串的编号。
+  19开始则为棋串数组，管理了棋盘共有哪些元素。
+  * `getStringInfo(x,y)`会根据传入的坐标获取棋串。
+  * `getSrcString(*args)`会对四个方向的棋串进行选举，决定基准棋串。
+  * `combineCurrentString(self,x,y,src,*args)`对这些棋串进行合并操作。
+    ```python
+    import logging
+    def combineCurrentString(self,x,y,src,*args):
+        logging.info("combine current string 处理前 string:",self.string)
+        subString=self.string['black'] if self.isBlack else self.string['white']
+        if x not in subString:
+            subString[x]={}
+        subString[x][y]=src
+        subString[src].append({'x':x,'y':y})
+        for s in args:
+            if s>0 and s!=src and not isinstance(s,bool):
+                if s in subString:
+                    subString[src].extend(subString[s])
+                    for key in subString:
+                        if key<19:
+                            for subkey in subString[key]:
+                                if subString[key][subkey]==s:
+                                    subString[key][subkey]=src
+                    logging.info("即将删除%s"%subString[s])
+                    del subString[s]
+    ```
