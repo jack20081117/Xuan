@@ -20,3 +20,12 @@ BLACK=1
 WHITE=-1
 EMPTY=0
 
+UNKNOWN='unknown'
+DRAW='draw'
+
+KOMI=6.5
+
+WINNER={
+    'B':1,
+    'W':-1
+}
