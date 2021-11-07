@@ -169,6 +169,14 @@ class Go(object):
                     board[i][j]=target
         return board
 
+    def transferSgf2StringAndBoard(self,sgfData):
+        self.__init__()
+        data=self.parseSgf(sgfData)
+        for i in range(len(data)):
+            singleData=data[i]
+            x,y,color=singleData['x'],singleData['y'],singleData['color']
+            logging.info('目前是第%d步棋,x=%d,y=%d,color=%s'%(i,x,y,color))
+
     @staticmethod
     def findBlank(board,cell):
         def _findBlank(board,result,cell):
@@ -259,6 +267,22 @@ class Go(object):
         return result
 
     @staticmethod
+    def parseAdditionalSgf(sgfData):
+        RE=getSgfInfo(sgfData,'RE','')
+        PB=getSgfInfo(sgfData,'PB','')
+        PW=getSgfInfo(sgfData,'PW','')
+        BR=getSgfInfo(sgfData,'BR','9d')
+        WR=getSgfInfo(sgfData,'WR','9d')
+        KM=getSgfInfo(sgfData,'KM','6.5')
+        AP=getSgfInfo(sgfData,'AP','Xuan')
+        DT=getSgfInfo(sgfData,'DT',getDatetime()['timestr'])
+        RU=getSgfInfo(sgfData,'RU=','chinese')
+        return {
+            'RE':RE,'PB':PB,'PW':PW,'BR':BR,'WR':WR,
+            'KM':KM,'AP':AP,'DT':DT,'RU':RU
+        }
+
+    @staticmethod
     def parseGoban2Sgf(gobanData):
         sgf=''
         for i in range(len(gobanData)):
@@ -272,13 +296,35 @@ class Go(object):
             'sgf':sgf
         }
 
-    def transferSgf2StringAndBoard(self,sgfData):
+    def parseSingleData(self,data):
+        sgf=data['sgf']
         self.__init__()
-        data=self.parseSgf(sgfData)
-        for i in range(len(data)):
-            singleData=data[i]
-            x,y,color=singleData['x'],singleData['y'],singleData['color']
-            logging.info('目前是第%d步棋,x=%d,y=%d,color=%s'%(i,x,y,color))
+        parsedSgf=self.parseSgf(sgf)
+        additionalSgf=self.parseAdditionalSgf(sgf)
+        goban=[]
+        stringList=[]
+        for i in range(len(parsedSgf)):
+            x=parsedSgf[i]['x']
+            y=parsedSgf[i]['y']
+            color=parsedSgf[i]['color']
+            success,board,string,robX,robY=self.GoLogic(x,y,color)
+            goban.append(board)
+            stringList.append(string)
+        RE=additionalSgf['RE']
+        if RE[0]!='W' and RE[0]!='B' and RE[0]!=UNKNOWN:
+            RE[0]=UNKNOWN
+        if RE!=UNKNOWN:
+            winnerc=RE[0]
+        else:
+            latestGoban=copy.deepcopy(goban[-1])
+            winResult=self.checkWinner(latestGoban)
+            winnerc='B' if winResult['black']>winResult['white']+KOMI else 'W'
+        winner=[WINNER[winnerc]]
+        return goban,winner,parsedSgf,stringList
+
+    def parseSgf2NetworkData(self,sgf):
+        sgfDict={'sgf':sgf}
+        return self.parseSingleData(sgfDict)
 
     def simpleGoLogic(self,x,y,color):
         self.isBlack=True if color=='black' else False
@@ -291,7 +337,7 @@ class Go(object):
                 self.cleanString(result[i])
 
     def returnData(self,success):
-        return (success,self.board,self.string,self.robX,self.robY)
+        return success,self.board,self.string,self.robX,self.robY
 
     def GoLogic(self,x,y,color):
         backupBoard=copy.deepcopy(self.board)
@@ -311,3 +357,31 @@ class Go(object):
         self.board[x][y]=flag
         self.combine(x,y)
         result=self.doKill(x,y,killFlag)
+        if len(result)>0:
+            for i in range(len(result)):
+                killed=self.cleanString(result[i])
+                if len(killed)==1:
+                    logging.info('判断打劫,robX=%d,robY=%d,x=%d,y=%d'%(self.robX,self.robY,x,y))
+                    if self.robX is not None\
+                    and self.robY is not None\
+                    and int(self.robX)==int(x)\
+                    and int(self.robY)==int(y):
+                        logging.error('无法在打劫点落子!')
+                        self.board=backupBoard
+                        self.string=backupString
+                        return self.returnData(False)
+                    self.robX=killed[0]['x']
+                    self.robY=killed[0]['y']
+                    logging.info('保存了目前打劫点:x=%d,y=%d'%(self.robX,self.robY))
+                else:
+                    self.robX=None
+                    self.robY=None
+        else:
+            selfResult=self.checkKill(x,y,flag)
+            if selfResult is not False:
+                self.board=backupBoard
+                self.string=backupString
+                self.robX=backupRobX
+                self.robY=backupRobY
+        logging.info('GoLogic校验成功!')
+        return self.returnData(True)
