@@ -385,3 +385,12 @@ class Go(object):
                 self.robY=backupRobY
         logging.info('GoLogic校验成功!')
         return self.returnData(True)
+
+    @staticmethod
+    def getDotLife(x,y,board):
+        if x<0 or x>18 or y<0 or y>18:
+            return 0
+        return 1 if not board[x][y] else 0
+
+    def getStringLife(self,board,L,threshold=4):
+        pass
