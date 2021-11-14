@@ -393,4 +393,69 @@ class Go(object):
         return 1 if not board[x][y] else 0
 
     def getStringLife(self,board,L,threshold=4):
-        pass
+        life=0
+        for i in range(len(L)):
+            x=L[i]['x']
+            y=L[i]['y']
+            directs=getFourDirect(x,y)
+            for direct in directs:
+                life+=self.getDotLife(direct['x'],direct['y'],board)
+        return life if life<threshold else -1
+
+    def getBoardAddition(self,board,string,color):
+        myBoard=copy.deepcopy(board)
+        oppoBoard=copy.deepcopy(board)
+        myLifeBoard=[getEmptyBoard(),getEmptyBoard(),getEmptyBoard()]
+        oppoLifeBoard=[getEmptyBoard(),getEmptyBoard(),getEmptyBoard()]
+        myColor=1
+        oppoColor=-1
+        if color==1:
+            myColorText='white'
+            oppoColorText='black'
+        else:
+            myColorText='black'
+            oppoColorText='white'
+        for i in range(19):
+            for j in range(19):
+                if board[i][j]!=color and board[i][j]:
+                    myBoard[i][j]=0
+                if board[i][j]==color:
+                    oppoBoard[i][j]=0
+        myString=copy.deepcopy(string[myColorText])
+        oppoString=copy.deepcopy(string[oppoColorText])
+        myArray=[[],[],[]]
+        oppoArray=[[],[],[]]
+        for key in myString:
+            if int(key)<19: continue
+            array=myString[key]
+            life=self.getStringLife(board,array)
+            if life==-1: continue
+            if life==1:
+                myArray[0].append(array)
+            if life==2:
+                myArray[1].append(array)
+            if life==3:
+                myArray[2].append(array)
+        for key in oppoString:
+            if int(key)<19: continue
+            array=oppoString[key]
+            life=self.getStringLife(board,array)
+            if life==-1: continue
+            if life==1:
+                oppoArray[0].append(array)
+            if life==2:
+                oppoArray[1].append(array)
+            if life==3:
+                oppoArray[2].append(array)
+        for k in range(3):
+            myLifeBoard[k]=self.setBoardByArray(myLifeBoard[k],myArray[k],myColor)
+            oppoLifeBoard[k]=self.setBoardByArray(oppoLifeBoard[k],oppoArray[k],oppoColor)
+        return myBoard,oppoBoard,myLifeBoard,oppoLifeBoard
+
+    @staticmethod
+    def setBoardByArray(board,array,color):
+        for i in range(len(array)):
+            x=array[i]['x']
+            y=array[i]['y']
+            board[x][y]=color
+        return board
