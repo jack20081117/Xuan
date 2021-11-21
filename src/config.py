@@ -29,3 +29,5 @@ WINNER={
     'B':1,
     'W':-1
 }
+
+GLOBAL_DICT={}
