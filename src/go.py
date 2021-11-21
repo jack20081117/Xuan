@@ -177,6 +177,17 @@ class Go(object):
             x,y,color=singleData['x'],singleData['y'],singleData['color']
             logging.info('目前是第%d步棋,x=%d,y=%d,color=%s'%(i,x,y,color))
 
+    def transferBoard2String(self,board):
+        self.__init__()
+        string=None
+        for i in range(19):
+            for j in range(19):
+                if board[i][j]:
+                    self.isBlack=True if board[i][j]==1 else False
+                    string=self.combine(i,j)
+        if string is None:string=getEmptyString()
+        return string
+
     @staticmethod
     def findBlank(board,cell):
         def _findBlank(board,result,cell):
@@ -459,3 +470,36 @@ class Go(object):
             y=array[i]['y']
             board[x][y]=color
         return board
+
+    @staticmethod
+    def setBoardByColor(board,color):
+        for i in range(19):
+            for j in range(19):
+                if board[i][j]!=color:
+                    board[i][j]=0
+        return board
+
+    @staticmethod
+    def getColorNumByText(text):
+        return 1 if text=='black' else 0
+
+    @staticmethod
+    def getColorTextByNum(num):
+        return 'black' if num==1 else 'white'
+
+    def getCurrentColorBoard(self,num):
+        board=getEmptyBoard()
+        for i in range(19):
+            for j in range(19):
+                board[i][j]=num
+        return board
+
+    @staticmethod
+    def getMyOppoBoard(board,mycolor,oppocolor):
+        myboard=copy.deepcopy(board)
+        oppoboard=copy.deepcopy(board)
+        for i in range(19):
+            for j in range(19):
+                myboard[i][j]=1 if myboard[i][j]==mycolor else 0
+                oppoboard[i][j]=1 if oppoboard[i][j]==oppocolor else 0
+        return myboard,oppoboard
