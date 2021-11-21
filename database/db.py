@@ -1,7 +1,7 @@
 import sqlite3
 
 class Database(object):
-    def __init__(self,name):
+    def init(self,name):
         self.filename=name
         self.conn=sqlite3.connect(self.filename,check_same_thread=False)
         self.cur=self.conn.cursor()
