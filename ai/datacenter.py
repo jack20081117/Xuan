@@ -19,7 +19,7 @@ class DataCenter(object):
         data=self.database.select(sql)
         return data
 
-    def setGoban(self,sgf,additional):
+    def saveGoban(self,sgf,additional):
         createtime=getDatetime()['timestr']
         black=additional['PB']
         white=additional['PW']
