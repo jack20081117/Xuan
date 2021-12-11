@@ -397,6 +397,24 @@ class Go(object):
         logging.info('GoLogic校验成功!')
         return self.returnData(True)
 
+    def getLastBoard(self,boardList,index,myColor,oppoColor):
+        myLast=[]
+        oppoLast=[]
+        start=index-7
+        for i in range(7):
+            if start<0 or start>len(boardList):
+                empty=getEmptyBoard()
+                myLast.append(empty)
+                oppoLast.append(empty)
+            else:
+                currentBoard=boardList[start]
+                myBoard=self.setBoardByColor(copy.deepcopy(currentBoard),myColor)
+                oppoBoard=self.setBoardByColor(copy.deepcopy(currentBoard),oppoColor)
+                myLast.append(myBoard)
+                oppoLast.append(oppoBoard)
+            start+=1
+        return myLast,oppoLast
+
     @staticmethod
     def getDotLife(x,y,board):
         if x<0 or x>18 or y<0 or y>18:
