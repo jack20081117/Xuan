@@ -125,7 +125,7 @@ Python+torch
 =>评价器(<a href="https://gitee.com/jack20081117/xuan/blob/master/model/value.py">value.py</a>)
 &策略器(<a href="https://gitee.com/jack20081117/xuan/blob/master/model/policy.py">policy.py</a>)
 =>结果
-##损失计算
+## 损失计算
 * 评价器：均方差损失
 * 策略器：交叉熵损失
 ```python
