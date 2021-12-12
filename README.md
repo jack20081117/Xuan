@@ -119,4 +119,23 @@ Python+torch
 
   若自身死棋则交给`checkSuicide(x,y)`将刚才的落子从棋串中清除。
 
+# 神经网络部分
+## 架构
+提取器(<a href="https://gitee.com/jack20081117/xuan/blob/master/model/feature.py">feature.py</a>)
+=>评价器(<a href="https://gitee.com/jack20081117/xuan/blob/master/model/value.py">value.py</a>)
+&策略器(<a href="https://gitee.com/jack20081117/xuan/blob/master/model/policy.py">policy.py</a>)
+=>结果
+##损失计算
+* 评价器：均方差损失
+* 策略器：交叉熵损失
+```python
+import torch
+
+def forward(winner,selfPlayWinner,probas,selfPlayProbas):
+    valueError=(selfPlayWinner-winner)**2
+    policyError=torch.sum((-selfPlayProbas*(1e-6+probas).log()),1)
+    totalError=(valueError.view(-1)+policyError).mean()
+    return totalError
+```
+
 # 谢谢支持！
