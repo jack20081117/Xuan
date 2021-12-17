@@ -195,33 +195,33 @@ class Go(object):
             board[i,j]=9
             result['cross'].add(cell)
             if i>0:
+                if not board[i-1,j]:
+                    _findBlank(board,result,(i-1,j))
                 if board[i-1,j]==1:
                     result['b_around'].add((i-1,j))
-                elif board[i-1,j]==2:
+                if board[i-1,j]==2:
                     result['w_around'].add((i-1,j))
-                elif not board[i-1,j]:
-                    _findBlank(board,result,(i-1,j))
             if i<18:
+                if not board[i+1,j]:
+                    _findBlank(board,result,(i+1,j))
                 if board[i+1,j]==1:
                     result['b_around'].add((i+1,j))
-                elif board[i+1,j]==2:
+                if board[i+1,j]==2:
                     result['w_around'].add((i+1,j))
-                elif not board[i+1,j]:
-                    _findBlank(board,result,(i+1,j))
             if j>0:
+                if not board[i,j-1]:
+                    _findBlank(board,result,(i,j-1))
                 if board[i,j-1]==1:
                     result['b_around'].add((i,j-1))
-                elif board[i,j-1]==2:
+                if board[i,j-1]==2:
                     result['w_around'].add((i,j-1))
-                elif not board[i,j-1]:
-                    _findBlank(board,result,(i,j-1))
             if j<18:
+                if not board[i,j+1]:
+                    _findBlank(board,result,(i,j+1))
                 if board[i,j+1]==1:
                     result['b_around'].add((i,j+1))
-                elif board[i,j+1]==2:
+                if board[i,j+1]==2:
                     result['w_around'].add((i,j+1))
-                elif not board[i,j+1]:
-                    _findBlank(board,result,(i,j+1))
 
         result={'cross':set(),'b_around':set(),'w_around':set()}
         _findBlank(board,result,cell)
