@@ -51,13 +51,14 @@ def findBlanks(board):
 def checkWinner(board):
     temp=numpy.copy(board)
     for item in findBlanks(numpy.copy(board)):
-        if not len(item['w_around']):
+        if not len(item['w_around']) and not len(item['b_around']):
+            value=9
+        elif not len(item['w_around']):
             value=3
         elif not len(item['b_around']):
             value=4
         else:
             value=9
-
         for i,j in item['cross']:
             temp[i,j]=value
     print('temp:\n',temp)
