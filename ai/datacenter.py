@@ -1,7 +1,7 @@
 from database.db import Database
 from database.sql import *
 from src.tools import *
-from src.config import *
+from config import *
 import hashlib,sqlite3,logging
 
 class DataCenter(object):

@@ -1,9 +1,7 @@
-import copy,torch,numpy,json,logging
+import copy,torch, json,logging
 
 from ai.datacenter import DataCenter
-from database.db import Database
-from database.sql import *
-from src.config import GLOBAL_DICT as gl
+from config import GLOBAL_DICT as gl
 from src.go import Go
 from src.tools import *
 

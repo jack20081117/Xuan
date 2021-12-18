@@ -1,8 +1,7 @@
 from src.tools import *
-from src.config import *
+from config import *
 
-from matplotlib import pyplot
-import numpy,os,logging,json,copy
+import numpy, logging,json,copy
 logging.basicConfig(level=logging.INFO)
 
 class Go(object):
