@@ -174,7 +174,10 @@ class Go(object):
         for i in range(len(data)):
             singleData=data[i]
             x,y,color=singleData['x'],singleData['y'],singleData['color']
-            logging.info('目前是第%d步棋,x=%d,y=%d,color=%s'%(i,x,y,color))
+            logging.info('目前是第%d步棋,x=%d,y=%d,color=%s'%(i+1,x,y,color))
+            self.simpleGoLogic(x,y,color)
+        logging.info('board->%s'%self.board)
+        logging.info('string->%s'%self.string)
 
     def transferBoard2String(self,board):
         self.__init__()
@@ -287,7 +290,7 @@ class Go(object):
         WR=getSgfInfo(sgfData,'WR','9d')
         KM=getSgfInfo(sgfData,'KM','6.5')
         AP=getSgfInfo(sgfData,'AP','Xuan')
-        DT=getSgfInfo(sgfData,'DT',getDatetime()['timestr'])
+        DT=getSgfInfo(sgfData,'DT',getDatetime()['datestr'])
         RU=getSgfInfo(sgfData,'RU=','chinese')
         return {
             'RE':RE,'PB':PB,'PW':PW,'BR':BR,'WR':WR,
