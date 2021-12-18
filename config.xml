@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <config>
     <string>
-        <black>
+        <color value="black">
             <x value="1">
                 <y value="2">
                     <num value="19" />
@@ -11,8 +11,18 @@
                 <x value="1" />
                 <y value="2" />
             </num>
-        </black>
-        <white>
-        </white>
+        </color>
+        <color value="white">
+        </color>
     </string>
+    <sgf>
+        <color value="B">
+            <x value="a">
+                <y value="c">
+                </y>
+            </x>
+        </color>
+        <color value="W">
+        </color>
+    </sgf>
 </config>
