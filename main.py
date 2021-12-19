@@ -3,7 +3,7 @@ from src.tools import *
 from src.net import Server
 from config import GLOBAL_DICT as gl
 
-fileName='./config.ini'
+filePath='./config.ini'
 
 def hello():
     print('''
@@ -20,7 +20,7 @@ def hello():
 
 if __name__ == '__main__':
     config=configparser.ConfigParser()
-    config.read(fileName,encoding='utf-8')
+    config.read(filePath,encoding='utf-8')
     port=config['tcp']['port']
 
     dbpath=os.path.dirname(os.path.realpath(__file__))
