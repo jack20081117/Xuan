@@ -1,7 +1,7 @@
 from database.db import Database
 from database.sql import *
 from src.tools import *
-from config import *
+from config import GLOBAL_DICT as gl
 import hashlib,sqlite3,logging
 
 class DataCenter(object):
@@ -11,8 +11,8 @@ class DataCenter(object):
 
     def __init__(self):
         self.database=Database()
-        self.databasePath=None
-        self.model={}
+        self.databasePath=gl.get('dbpath',None)
+        self.model=gl.get('model',None)
 
     def getGoban(self):
         sql=selectGoData
