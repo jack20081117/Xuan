@@ -124,7 +124,7 @@ def saveModel(feature,policy,value,first=False):
             torch.save(policy,policyPath)
             logging.info('保存value网络...')
             torch.save(value,valuePath)
-        time=getDatetime()['datestr']
+        time=getDatetime()['timestr']
         os.mkdir(os.path.join('./savedModel',time))
         logging.info('保存feature网络...')
         torch.save(feature,os.path.join('./savedModel',time,'feature.bin'))

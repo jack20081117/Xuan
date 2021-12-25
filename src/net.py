@@ -14,7 +14,7 @@ class Server(object):
             data=sock.recv(20000).decode()#调用recv(max)方法,一次最多接收指定的字节数,如果max太小连东西都收不到
             if not data or data=='exit':
                 break
-            logging.info('收到请求,time:',getDatetime()['timeformat'])
+            logging.info('收到请求,time:%s'%getDatetime()['timeformat'])
             response=self.xuan.parseOperator(data)
             sock.send(json.dumps(response).encode())
         sock.close()
