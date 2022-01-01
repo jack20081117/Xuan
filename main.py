@@ -2,6 +2,7 @@ import configparser,json,os,logging
 from src.tools import *
 from src.net import Server
 from config import GLOBAL_DICT as gl
+from config import *
 
 filePath='./config.ini'
 
@@ -19,8 +20,7 @@ def hello():
     print("Copyright 2021-2025.All rights deserved.")
 
 if __name__ == '__main__':
-    config=configparser.ConfigParser()
-    config.read(filePath,encoding='utf-8')
+    config=CONFIG
     port=config['tcp']['port']
 
     dbpath=os.path.dirname(os.path.realpath(__file__))

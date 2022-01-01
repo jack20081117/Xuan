@@ -1,12 +1,10 @@
-import sqlite3,sys,os,json,configparser,logging
+import sqlite3,sys,os,logging
 from src.go import Go
 from ai.datacenter import DataCenter
+from config import *
 from config import GLOBAL_DICT as gl
 
-filePath='./config.ini'
-
-config=configparser.ConfigParser()
-config.read(filePath)
+config=CONFIG
 port=config['tcp']['port']
 
 dbpath=os.path.dirname(os.path.realpath(__file__))
