@@ -3,5 +3,40 @@
   "version": "0.0.1",
   "author": "张珈瑞 <zjr2008jack@qq.com>",
   "description": "An electron-vue project",
-  "license": "GPL-3.0"
+  "license": "GPL-3.0",
+  "scripts": {
+    "build": "node .electron-vue/build.js && electron-builder",
+    "build:dir": "node .electron-vue/build.js && electron-builder --dir",
+    "build:clean": "cross-env BUILD_TARGET=clean node .electron-vue/build.js",
+    "build:web": "cross-env BUILD_TARGET=web node .electron-vue/build.js",
+    "dev": "node .electron-vue/dev-runner.js",
+    "pack": "npm run pack:main && npm run pack:renderer",
+    "pack:main": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.main.config.js",
+    "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
+    "postinstall": "",
+    "package-darwin": "electron-packager . Xuan --platform=darwin --arch=x64 --icon=./Xuan.ico --out=./out  --app-version=0.01 --overwrite",
+    "package-win32": "electron-packager . Xuan --platform=win32 --arch=x64 --out=./out --icon=./Xuan.ico  --app-version=0.01 --overwrite --electron-zip-dir=../"
+  },
+  "dependencies": {
+    "@sabaki/deadstones": "^2.1.2",
+    "@sabaki/influence": "^1.2.2",
+    "axios": "^0.21.1",
+    "electron-debug": "^1.5.0",
+    "electron-devtools-installer": "^2.2.4",
+    "electron-localshortcut": "^3.2.1",
+    "electron-settings": "^4.0.2",
+    "electron-store": "^2.0.0",
+    "emitvue": "^1.0.1",
+    "lodash": "^4.17.21",
+    "view-design": "^4.6.1",
+    "vue": "^2.5.16",
+    "vue-electron": "^1.0.6",
+    "vue-router": "^3.0.1",
+    "vuex": "^3.0.1",
+    "vuex-electron": "^1.0.0"
+  },
+  "devDependencies": {
+    "devtron": "^1.4.0",
+    "electron": "^2.0.4"
+  }
 }

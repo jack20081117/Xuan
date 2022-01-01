@@ -1,6 +1,7 @@
 .idea
 savedModel
 dataSet
+node_modules
 
 package-lock.json
 
