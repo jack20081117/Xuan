@@ -16,19 +16,21 @@ class Go(object):
         self.board=data
 
     def getStringInfo(self,x,y):
+        #越界 刚才的点在边界
         if x<0 or x>18 or y<0 or y>18:
             return -1
 
+        #目前是黑在下 但这个点返回的是空或者白
         color=1 if self.isBlack else -1
         if self.board[x][y]!=color:
-            return 0
+            return False
 
         subString=self.string['black'] if self.isBlack else self.string['white']
         logging.info("get string info:x=%d,y=%d"%(x,y))
         if x in subString and y in subString[x]:
             num=subString[x][y]
             return num
-        return 1
+        return True
 
     @staticmethod
     def getSrcString(*args):
