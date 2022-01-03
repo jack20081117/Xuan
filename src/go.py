@@ -1,7 +1,7 @@
 from src.tools import *
 from config import *
 
-import numpy, logging,json,copy
+import numpy,logging,json,copy
 logging.basicConfig(level=logging.INFO)
 
 class Go(object):
