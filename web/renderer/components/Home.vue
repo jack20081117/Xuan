@@ -96,10 +96,10 @@ export default {
         this.drawText();
         Bus.$on("newGame",()=>{
             console.log("START :>> ");
-        })
+        });
         Bus.$on("switchLock",(value)=>{
             this.lockedBlack=value;
-        })
+        });
         Bus.$on("stepControl",(value)=>{
             this.step=value;
             this.refresh();
@@ -110,7 +110,7 @@ export default {
             let current=this.history[this.currentNum];
             console.log("stepControl current :>> ",current)
             this.switchDrawRadio(current.siteX,current.siteY);
-        })
+        });
         Bus.$on("analyze",async()=>{
             let data={
                 operator:"run",
@@ -118,9 +118,55 @@ export default {
                 color:this.isBlack?"black":"white",
                 string:_.cloneDeep(this.string),
                 goban:_.cloneDeep(this.goban)
-            }
+            };
             console.log(`ip=${this.config.ip} port=${this.config.port}`);
-        })
+            let result=await tcp.send(data,this.config.ip,this.config.port);
+            console.log("result :>> ",result);
+            if(!result){
+                this.$Message.error("引擎传输数据格式错误!");
+            }
+            let probas=result.data;
+            let best=probas[0];
+            let x=best.x,y=best.y;
+            console.log("引擎选点 :>> ",x,y);
+            this.play(x,y);
+        });
+        Bus.$on("saveGoban",async()=>{
+            let data={
+                operator:"saveGoban",
+                goban:JSON.stringify(this.goban)
+            };
+            let result=await tcp.send(data,this.config.ip,this.config.port);
+            console.log("saveGoban :>> ",result);
+            if(!result){
+                this.$Message.error("引擎传输数据格式错误!");
+            }else{
+                this.$Message.info(result.message);
+            }
+        });
+        //局面分析
+        Bus.$on("boardAnalyze",()=>{
+            this.getInfluence();
+        });
+
+        //导入棋谱
+        Bus.$on("addSgf",(value)=>{
+            this.doSGF(value);
+        });
+
+        // 棋盘按钮控制
+        Bus.$on('boardControl',(type)=>{
+            this.doBoardControl(type)
+        });
+        Bus.$on('changeShowXY',(value)=>{
+            this.showXY=value;
+            this.refresh();
+        });
+
+        //判断胜负
+        Bus.$on('checkWinner',()=>{
+            this.checkWinner();
+        });
     },
     methods:{
         newGame(){//初始化
@@ -420,7 +466,7 @@ export default {
                 let {x,y,color}=sgfData[i];
                 this.goban.push({x,y,color:(color==='black'?1:-1)});
                 x--;y--;
-                console.log(`目前是第${i}手,x:${x},y:${y},color:${color}");
+                console.log(`目前是第${i}手,x:${x},y:${y},color:${color}`);
                 this.sgfLogic(x,y,color);
             }
             console.log("string :>> ",this.string);
