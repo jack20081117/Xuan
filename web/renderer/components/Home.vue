@@ -91,7 +91,36 @@ export default {
     async mounted(){
         this.go=document.getElementById("go");
         this.context=this.go.getContext("2d");
-
+        this.drawMap();
+        this.drawStar();
+        this.drawText();
+        Bus.$on("newGame",()=>{
+            console.log("START :>> ");
+        })
+        Bus.$on("switchLock",(value)=>{
+            this.lockedBlack=value;
+        })
+        Bus.$on("stepControl",(value)=>{
+            this.step=value;
+            this.refresh();
+            if(this.currentNum===-1){
+                console.log("无需绘制落子");
+                return;
+            }
+            let current=this.history[this.currentNum];
+            console.log("stepControl current :>> ",current)
+            this.switchDrawRadio(current.siteX,current.siteY);
+        })
+        Bus.$on("analyze",async()=>{
+            let data={
+                operator:"run",
+                board:_.cloneDeep(this.board),
+                color:this.isBlack?"black":"white",
+                string:_.cloneDeep(this.string),
+                goban:_.cloneDeep(this.goban)
+            }
+            console.log(`ip=${this.config.ip} port=${this.config.port}`);
+        })
     },
     methods:{
         newGame(){//初始化
@@ -108,9 +137,14 @@ export default {
         prePlay(event){
             this.event=event;
             if(this.currentNum===-1&&this.history.length===0){
+                this.play();
                 return;
             }
-
+            if((this.currentNum!==this.history.length-1)&&(this.currentNum!==-1)&&(this.history.length!==0)){
+                this.modalBoardControl=true;
+            }else{
+                this.play();
+            }
         },
         play(out_x,out_y){
             let event=this.event;
@@ -165,7 +199,35 @@ export default {
                         this.robY=null;
                     }
                 }
+                this.refresh();
+            }else{
+                let result=go.checkKill(x,y,this.board[x][y]===1?1:-1,this.string,this.board);
+                if(res!==false){
+                    this.$Message.error("无法在导致自己死棋的位置落子!");
+                    this.string=tempString;
+                    this.board=tempBoard;
+                    return;
+                }
+                this.robX=null;
+                this.robY=null;
             }
+            this.drawChess(x,y);
+            this.siteX=x;
+            this.siteY=y;
+            this.goban.push({x,y,color:this.isBlack?-1:1});
+            this.refresh();
+            console.log("goban :>> ",this.goban);
+            this.currentNum++;
+            historyPush={
+                string:_.cloneDeep(this.string),
+                board:_.cloneDeep(this.board),
+                robX:this.robX,
+                robY:this.robY,
+                siteX:this.siteX,
+                siteY:this.siteY
+            }
+            this.history.push(historyPush);
+            this.switchDrawRadio(x,y);
         },
         refresh(){
             this.drawMap();
@@ -327,6 +389,153 @@ export default {
                 default:
                     break;
             }
+        },
+        getInfluence(){
+            let result=influence.map(this.board);
+            console.log("result :>> ",result)
+            for(let i=0;i<19;i++)
+                for(let j=0;j<19;j++){
+                    let value=result[i][j];
+                    if((value===0)||(value===1)||(value===-1)) continue;
+                    value=parseFloat(value.toString().slice(0,4));
+                    let color=(value>0?"#000000":"#FFFFFF");
+                    if(value<0) value=-value;
+                    value*=10;
+                    this.drawCircle(i,j,value,color);
+                }
+        },
+        sgfLogic(x,y,color){
+            this.isBlack=(color==="black");
+            this.board[x][y]=this.isBlack?1:-1;
+            go.combine(x,y,this.string,this.board,this.isBlack);
+            let killRes=go.kill(x,y,this.board[x][y]===1?-1:1,this.string,this.board);
+            if(killRes.length>0)
+                for(let i=0;i<killRes.length;i++)
+                    go.cleanString(killRes[i],this.string,this.board);
+        },
+        parseSgf(sgfData){
+            console.log("sgf :>> ",sgfData);
+            this.newGame();
+            for(let i=0;i<sgfData.length;i++){
+                let {x,y,color}=sgfData[i];
+                this.goban.push({x,y,color:(color==='black'?1:-1)});
+                x--;y--;
+                console.log(`目前是第${i}手,x:${x},y:${y},color:${color}");
+                this.sgfLogic(x,y,color);
+            }
+            console.log("string :>> ",this.string);
+            console.log("board :>> ",this.board);
+            console.log("goban :>> ",this.goban);
+            this.refresh();
+        },
+        doBoardControl(type){
+            console.log('type :>> ',type);
+            switch(type){
+                case "begin"://回退到棋局开始
+                    if(this.currentNum===-1){
+                        this.$Message.warning("已经到最开始的位置");
+                        return;
+                    }
+                    this.currentNum=-1;
+                    break;
+                case "fiveback"://回退5步
+                    if(this.currentNum===-1){
+                        this.$Message.warning("已经到最开始的位置");
+                        return;
+                    }
+                    this.currentNum-=5;
+                    break;
+                case "back"://回退1步(悔棋)
+                    if(this.currentNum===-1){
+                        this.$Message.warning("已经到最开始的位置");
+                        return;
+                    }
+                    this.currentNum--;
+                    break;
+                case "step"://前进1步
+                    if(this.currentNum===this.history.length-1){
+                        this.$Message.warning("已经到最末尾的位置");
+                        return;
+                    }
+                    this.currentNum++;
+                    break;
+                case "fivestep"://前进5步
+                    if(this.currentNum===this.history.length-1){
+                        this.$Message.warning("已经到最末尾的位置");
+                        return;
+                    }
+                    this.currentNum+=5;
+                    break;
+                case "end"://前进到最近一步
+                    if(this.currentNum===this.history.length-1){
+                        this.$Message.warning("已经到最末尾的位置");
+                        return;
+                    }
+                    this.currentNum=this.history.length-1;
+                    break;
+            }
+            this.currentNum=Math.max(this.currentNum,-1);
+            this.currentNum=Math.min(this.currentNum,this.history.length-1);
+            console.log("currentNum :>> ",this.currentNum);
+            this.updateBoardData();
+            console.log("string :>> ",this.string);
+            console.log("board :>> ",this.board);
+            this.refresh();
+            if(this.currentNum===-1) return;
+            this.switchDrawRadio(this.siteX,this.siteY);
+        },
+        updateBoardData(){
+            console.log("history[currentNum]",this.history[this.currentNum]);
+            if(this.currentNum===-1){
+                this.board=util.getEmptyBoard();
+                this.string=util.getEmptyString();
+                this.robX=null;
+                this.robY=null;
+                this.siteX=null;
+                this.siteY=null;
+            }else{
+                this.string=this.history[this.currentNum].string;
+                this.board=this.history[this.currentNum].board;
+                this.robX=this.history[this.currentNum].robX;
+                this.robY=this.history[this.currentNum].robY;
+                this.siteX=this.history[this.currentNum].siteX;
+                this.siteY=this.history[this.currentNum].siteY;
+            }
+        },
+        boardControlOk(){
+            //截断历史
+            if (this.currentNum!==-1) {
+                this.history=this.history.slice(0,this.currentNum)
+                this.currentNum--;
+            } else {
+                this.history=[];
+            }
+            this.play();
+            this.$Message.success('已修改历史棋谱');
+        },
+        boardControlCancel(){
+            this.$Message.info('暂未修改棋谱');
+        },
+        checkWinner(){
+            let res=influence.areaMap(this.board);
+            console.log("res :>> ,res");
+            let black=0,white=0;
+            for(let i=0;i<19;i++)
+                for(let j=0;j<19;j++){
+                    if(res[i][j]===1) black++;
+                    if(res[i][j]===-1) white++;
+                }
+            let text=(black>white+6.5)?"黑胜":"白胜";
+            console.log("black :>> ",black);
+            console.log("white :>> ",white);
+            this.blackWin=black;
+            this.whiteWin=white;
+            this.text=text;
+            this.modalCheckWinner=true;
+            console.log("modalCheckWinner :>> ",this.modalCheckWinner);
+        },
+        setWinnerModal(){
+            this.modalCheckWinner=!this.modalCheckWinner;
         }
     }
 };
