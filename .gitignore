@@ -1,7 +1,11 @@
+!.gitkeep
+
 .idea
 savedModel
 dataSet
 node_modules
+dist
+static
 
 package-lock.json
 
