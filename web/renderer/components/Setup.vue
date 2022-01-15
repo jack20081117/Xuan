@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import set from "electron-settings";
+import settings from "electron-settings";
 import bus from "emitvue";
 import _ from "lodash";
 
@@ -44,7 +44,7 @@ export default {
     },
     methods:{
         async getSet(){
-            this.setting=await set.get("setting");
+            this.setting=await settings.get("setting");
             console.log("setting :>> ",this.setting);
             if(!this.setting||_.isEmpty(this.setting)){
                 this.setting=this.defaultSet;
