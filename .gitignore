@@ -1,6 +1,7 @@
 !.gitkeep
 
 .idea
+.vscode
 savedModel
 dataSet
 node_modules
