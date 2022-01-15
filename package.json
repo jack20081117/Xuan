@@ -17,6 +17,34 @@
     "package-darwin": "electron-packager . Xuan --platform=darwin --arch=x64 --icon=./Xuan.ico --out=./out  --app-version=0.01 --overwrite",
     "package-win32": "electron-packager . Xuan --platform=win32 --arch=x64 --out=./out --icon=./Xuan.ico  --app-version=0.01 --overwrite --electron-zip-dir=../"
   },
+  "build": {
+    "productName": "xuan",
+    "appId": "com.example.yourapp",
+    "directories": {
+      "output": "build"
+    },
+    "files": [
+      "dist/electron/**/*"
+    ],
+    "dmg": {
+      "contents": [
+        {
+          "x": 410,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        },
+        {
+          "x": 130,
+          "y": 150,
+          "type": "file"
+        }
+      ]
+    },
+    "win": {
+      "icon": "build/icons/icon.ico"
+    }
+  },
   "dependencies": {
     "@sabaki/deadstones": "^2.1.2",
     "@sabaki/influence": "^1.2.2",
