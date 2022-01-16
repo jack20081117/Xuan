@@ -240,6 +240,7 @@ class Go(object):
         return blanks
 
     def checkWinner(self,board):
+        logging.info('checking winner...')
         board=self.transferBoard(board,-1,2)
         temp=numpy.copy(board)
         for item in self.findBlanks(numpy.copy(board)):
@@ -257,6 +258,8 @@ class Go(object):
         black=temp[temp==1].size+temp[temp==3].size
         white=temp[temp==2].size+temp[temp==4].size
         common=temp[temp==9].size
+
+        logging.info('black:%d,white:%d,common:%d'%(black,white,common))
 
         return {
             'black':black,
@@ -344,6 +347,8 @@ class Go(object):
         return self.parseSingleData(sgfDict)
 
     def simpleGoLogic(self,x,y,color):
+        #Xuan内部使用的围棋逻辑,即把传进来的坐标转为自己的棋盘信息
+        #不需要判断自身死棋或者打劫 因为传进来的棋谱默认合法
         self.isBlack=True if color=='black' else False
         flag=1 if color=='black' else -1
         self.board[x][y]=flag
@@ -356,13 +361,15 @@ class Go(object):
     def returnData(self,success):
         return success,self.board,self.string,self.robX,self.robY
 
-    def GoLogic(self,x,y,color):
+    def GoLogic(self,x,y,color):#完整的围棋逻辑
+        #先做好备份 防止出现要类似悔棋的逻辑
         backupBoard=copy.deepcopy(self.board)
         backupString=copy.deepcopy(self.string)
         backupRobX,backupRobY=self.robX,self.robY
         checkStep=self.checkStep(x,y)
         if not checkStep:
             return self.returnData(False)
+        #判断自杀逻辑是反过来的
         if color=='black':
             self.isBlack=True
             flag=1
@@ -374,16 +381,18 @@ class Go(object):
         self.board[x][y]=flag
         self.combine(x,y)
         result=self.doKill(x,y,killFlag)
-        if len(result)>0:
+        if len(result):
             for i in range(len(result)):
                 killed=self.cleanString(result[i])
                 if len(killed)==1:
+                    #在这里判断打劫
                     logging.info('判断打劫,robX=%d,robY=%d,x=%d,y=%d'%(self.robX,self.robY,x,y))
                     if self.robX is not None\
                     and self.robY is not None\
                     and int(self.robX)==int(x)\
                     and int(self.robY)==int(y):
                         logging.error('无法在打劫点落子!')
+                        logging.error('GoLogic校验失败!')
                         self.board=backupBoard
                         self.string=backupString
                         return self.returnData(False)
@@ -395,11 +404,13 @@ class Go(object):
                     self.robY=None
         else:
             selfResult=self.checkKill(x,y,flag)
-            if selfResult is not False:
+            if selfResult:
                 self.board=backupBoard
                 self.string=backupString
                 self.robX=backupRobX
                 self.robY=backupRobY
+                logging.error('GoLogic校验失败!')
+                return self.returnData(False)
         logging.info('GoLogic校验成功!')
         return self.returnData(True)
 

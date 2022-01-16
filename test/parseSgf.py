@@ -1,4 +1,5 @@
 from src.go import Go
+import time
 
 #弈客300手大型棋谱
 #重要的事情说三遍:
@@ -13,6 +14,7 @@ if __name__ == '__main__':
     result=go.parseAdditionalSgf(example)
     print(result)
 
+    time.sleep(5)
+
     go.transferSgf2StringAndBoard(yk_300)
     result_300=go.checkWinner(go.board)
-    print(result_300)
