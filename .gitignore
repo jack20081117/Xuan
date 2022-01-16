@@ -1,13 +1,13 @@
-!.gitkeep
-
 .idea
 .vscode
 savedModel
 dataSet
 node_modules
-dist/electron
-dist/web
+dist/electron/*
+dist/web/*
 static
+
+!.gitkeep
 
 package-lock.json
 
