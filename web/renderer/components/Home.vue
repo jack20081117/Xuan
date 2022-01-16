@@ -459,7 +459,7 @@ export default {
                 for(let i=0;i<killRes.length;i++)
                     Go.cleanString(killRes[i],this.string,this.board);
         },
-        parseSgf(sgfData){
+        doSGF(sgfData){
             console.log("sgf :>> ",sgfData);
             this.newGame();
             for(let i=0;i<sgfData.length;i++){
