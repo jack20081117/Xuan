@@ -50,7 +50,7 @@ export default new class{
         subString[src].push({x,y});
         for(let i=0;i<directs.length;i++){
             let s=directs[i];
-            if(s>0&&su!==src){
+            if(s>0&&s!==src){
                 subString[src]=subString[src].concat(subString[s]);
                 for(let key in subString) if(key<19)
                     for(let subKey in subString[key])
@@ -91,7 +91,7 @@ export default new class{
     kill(x,y,flag,string,board){
         let {up,down,left,right}=this.getFourDirect(x,y);
         let killed=[];
-        directs=[up,down,left,right];
+        let directs=[up,down,left,right];
         for(let i=0;i<directs.length;i++){
             let s=directs[i];
             if(s.x>=0&&s.x<19&&s.y>=0&&s.y<19)
@@ -113,7 +113,7 @@ export default new class{
             let x=arr[i].x;
             let y=arr[i].y;
             let {up,down,left,right}=this.getFourDirect(x,y);
-            directs=[up,down,left,right];
+            let directs=[up,down,left,right];
             for(let i=0;i<directs.length;i++){
                 let s=directs[i];
                 if(s.x>=0&&s.x<19&&s.y>=0&&s.y<19)

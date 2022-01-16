@@ -33,7 +33,7 @@ import Bus from "emitvue";
 import settings from "electron-settings";
 import influence from "@sabaki/influence";
 import * as util from "./util.js";
-import go from "./go.js";
+import Go from "./go.js";
 import * as constant from './constant.js';
 
 let sound=document.body.appendChild(document.createElement("span"));
@@ -221,11 +221,11 @@ export default {
             this.x=x;
             this.y=y;
 
-            go.combine(x,y,this.string,this.board,this.isBlack);
-            let killRes=go.kill(x,y,this.board[x][y]===1?-1:1,this.string,this.board);
+            Go.combine(x,y,this.string,this.board,this.isBlack);
+            let killRes=Go.kill(x,y,this.board[x][y]===1?-1:1,this.string,this.board);
             if(killRes.length>0){
                 for(let i=0;i<killRes.length;i++){
-                    let temp=go.cleanString(killRes[i],this.string,this.board);
+                    let temp=Go.cleanString(killRes[i],this.string,this.board);
                     let killed=temp.killed;
                     this.string=temp.string;
                     this.board=temp.board;
@@ -247,8 +247,8 @@ export default {
                 }
                 this.refresh();
             }else{
-                let result=go.checkKill(x,y,this.board[x][y]===1?1:-1,this.string,this.board);
-                if(res!==false){
+                let result=Go.checkKill(x,y,this.board[x][y]===1?1:-1,this.string,this.board);
+                if(result!==false){
                     this.$Message.error("无法在导致自己死棋的位置落子!");
                     this.string=tempString;
                     this.board=tempBoard;
@@ -264,7 +264,7 @@ export default {
             this.refresh();
             console.log("goban :>> ",this.goban);
             this.currentNum++;
-            historyPush={
+            let historyPush={
                 string:_.cloneDeep(this.string),
                 board:_.cloneDeep(this.board),
                 robX:this.robX,
@@ -289,7 +289,7 @@ export default {
                 this.context.beginPath();
                 this.context.lineWidth=0.3;
                 this.context.moveTo(40*i+this.offsetX,0+this.offsetY);
-                this.context.moveTo(40*i+this.offsetX,40*18+this.offsetY);
+                this.context.lineTo(40*i+this.offsetX,40*18+this.offsetY);
                 this.context.closePath();
                 this.context.stroke();
             }
@@ -297,7 +297,7 @@ export default {
                 this.context.beginPath();
                 this.context.lineWidth=0.3;
                 this.context.moveTo(0+this.offsetX,40*i+this.offsetY);
-                this.context.moveTo(40*18+this.offsetX,40*i+this.offsetY);
+                this.context.lineTo(40*18+this.offsetX,40*i+this.offsetY);
                 this.context.closePath();
                 this.context.stroke();
             }
@@ -349,7 +349,7 @@ export default {
                 this.context.fillText(key,textInfo.x2,textInfo.y2);
             }
         },
-        drawBoard() {
+        drawBoard(){
             //遍历 绘制所有的棋子
             for(let i=0; i<19;i++)
                 for(let j=0;j<19;j++)
@@ -453,11 +453,11 @@ export default {
         sgfLogic(x,y,color){
             this.isBlack=(color==="black");
             this.board[x][y]=this.isBlack?1:-1;
-            go.combine(x,y,this.string,this.board,this.isBlack);
-            let killRes=go.kill(x,y,this.board[x][y]===1?-1:1,this.string,this.board);
+            Go.combine(x,y,this.string,this.board,this.isBlack);
+            let killRes=Go.kill(x,y,this.board[x][y]===1?-1:1,this.string,this.board);
             if(killRes.length>0)
                 for(let i=0;i<killRes.length;i++)
-                    go.cleanString(killRes[i],this.string,this.board);
+                    Go.cleanString(killRes[i],this.string,this.board);
         },
         parseSgf(sgfData){
             console.log("sgf :>> ",sgfData);
