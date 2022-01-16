@@ -53,7 +53,7 @@ export default {
             event:null,
             showModal:false,//是否打开修改配置的窗口
             string:util.getEmptyString(),//目前棋盘上的棋串
-            boardSize=19,
+            boardSize:19,
             robX:null,robY:null,//打劫位置
             siteX:19,siteY:19,//当前步位置
             step:"step",//落子样式
@@ -64,8 +64,8 @@ export default {
             //canvas
             go:null,
             context:null,
-            board:util.getEmptyBoard(),
-            goban=[],//棋谱 格式:{x,y,color}
+            board:(util.getEmptyBoard()),//棋盘 0为空 1为黑棋 -1为白棋
+            goban:[],//棋谱 格式:{x,y,color}
             currentNum:-1,//目前手数
             history:[],//历史信息 {board:[],string:[]}
             canvasData:null,
