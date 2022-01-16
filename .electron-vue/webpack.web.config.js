@@ -16,9 +16,6 @@ let webConfig={
     entry:{
         web:path.join(__dirname,'../web/renderer/main.js')
     },
-    externals:[
-        ...Object.keys(dependencies||{}).filter(d=>!whiteListedModules.includes(d))
-    ],
     module:{
         rules:[
             {
@@ -148,7 +145,7 @@ if(process.env.NODE_ENV==='production'){
     webConfig.devtool='';
     webConfig.plugins.push(
         new MinifyPlugin(),
-        new webpack.CopyWebpackPlugin([{
+        new CopyWebpackPlugin([{
             from:path.join(__dirname,'../static'),
             to:path.join(__dirname,'../dist/web/static'),
             ignore:['.*']

@@ -155,7 +155,7 @@ if(process.env.NODE_ENV==='production'){
     rendererConfig.devtool='';
     rendererConfig.plugins.push(
         new MinifyPlugin(),
-        new webpack.CopyWebpackPlugin([{
+        new CopyWebpackPlugin([{
             from:path.join(__dirname,'../static'),
             to:path.join(__dirname,'../dist/electron/static'),
             ignore:['.*']

@@ -45,7 +45,7 @@ export function getEmptyBoard(){
         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-    ]
+    ];
 }
 
 export function getEmptyString(){
@@ -53,5 +53,5 @@ export function getEmptyString(){
         black:{},
         white:{},
         num:19
-    }
+    };
 }
