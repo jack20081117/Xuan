@@ -15,7 +15,7 @@ class Go(object):
     def setBoard(self,data):
         self.board=data
 
-    def getStringInfo(self,x,y):
+    def getStringInfo(self,x,y):#返回(x,y)点所在的棋串编号
         #越界 刚才的点在边界
         if x<0 or x>18 or y<0 or y>18:
             return -1
@@ -54,7 +54,7 @@ class Go(object):
                             for subkey in subString[key]:
                                 if subString[key][subkey]==s:
                                     subString[key][subkey]=src
-                    logging.info("即将删除%s"%subString[s])
+                    logging.info("即将删除棋串%s"%subString[s])
                     del subString[s]
 
     def combine(self,x,y):
@@ -81,6 +81,7 @@ class Go(object):
             subString[x][y]=stringNum
             subString[stringNum].append({'x':x,'y':y})
             self.string['num']+=1
+            logging.info('combine result:%s'%self.string)
         else:
             logging.info('combine 检测到需要合并string:',self.string)
             src=self.getSrcString(su,sd,sl,sr)
@@ -139,28 +140,30 @@ class Go(object):
         elif num in self.string['white']: color='white'
         else: return []
         killed=[]
-        L=self.string[color][num]
+        subString=self.string[color]
+        L=subString[num]
         if L is None:
             logging.info('棋串%d已被杀死'%num)
             return []
         for i in range(len(L)):
             x,y=L[i]['x'],L[i]['y']
             self.board[x][y]=0#将棋串中所有棋子标记为0
-            if y in self.string[color][x]:
-                self.string[color][x].pop(y)
+            if y in subString[x]:
+                subString[x].pop(y)
                 killed.append({'x':x,'y':y})
         return killed
 
     def checkSuicide(self,x,y):
         color='black' if self.board[x][y]==1 else 'white'
-        num=self.string[color][x][y]
-        L=self.string[color][num]
+        subString=self.string[color]
+        num=subString[x][y]
+        L=subString[num]
         for i in range(len(L)-1,-1,-1):
             if L[i]['x']==x and L[i]['y']==y:
                 del L[i]
                 break
         self.board[x][y]=0
-        self.string[color]['x'].pop('y')
+        subString['x'].pop('y')
 
     @staticmethod
     def transferBoard(board,src,target):
@@ -372,13 +375,13 @@ class Go(object):
         #判断自杀逻辑是反过来的
         if color=='black':
             self.isBlack=True
-            flag=1
+            selfKillflag=1
             killFlag=-1
         else:
             self.isBlack=False
-            flag=-1
+            selfKillflag=-1
             killFlag=1
-        self.board[x][y]=flag
+        self.board[x][y]=selfKillflag
         self.combine(x,y)
         result=self.doKill(x,y,killFlag)
         if len(result):
@@ -386,7 +389,7 @@ class Go(object):
                 killed=self.cleanString(result[i])
                 if len(killed)==1:
                     #在这里判断打劫
-                    logging.info('判断打劫,robX=%d,robY=%d,x=%d,y=%d'%(self.robX,self.robY,x,y))
+                    logging.info('GoLogic正在判断打劫,robX=%d,robY=%d,x=%d,y=%d'%(self.robX,self.robY,x,y))
                     if self.robX is not None\
                     and self.robY is not None\
                     and int(self.robX)==int(x)\
@@ -403,7 +406,7 @@ class Go(object):
                     self.robX=None
                     self.robY=None
         else:
-            selfResult=self.checkKill(x,y,flag)
+            selfResult=self.checkKill(x,y,selfKillflag)
             if selfResult:
                 self.board=backupBoard
                 self.string=backupString

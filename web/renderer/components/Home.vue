@@ -230,7 +230,7 @@ export default {
                     this.string=temp.string;
                     this.board=temp.board;
                     if(killed.length===1){//杀死一个棋子的话可能是打劫,要判断
-                        if(x===this.robX&&y===robY){
+                        if(x===this.robX&&y===this.robY){
                             this.$Message.error("无法在打劫点落子");
                             this.string=tempString;
                             this.board=tempBoard;

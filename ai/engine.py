@@ -174,6 +174,6 @@ class Xuan(object):
             success,board,string,robX,robY=self.go.GoLogic(x,y,color_text)
             board_list.append(board)
             if success is not True:
-                print("step=%d,x=%d,y=%d,color=%d"%(step,x,y,color))
+                logging.info("step=%d,x=%d,y=%d,color=%d"%(step,x,y,color))
                 raise RuntimeError("组成围棋逻辑出现问题")
         return board,string,robX,robY,board_list
