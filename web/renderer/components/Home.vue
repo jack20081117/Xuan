@@ -77,7 +77,7 @@ export default {
             modalCheckWinner:false,
             blackWin:0,whiteWin:0,
             text:''
-        }
+        };
     },
     async created(){
         this.config=await settings.get("setting");

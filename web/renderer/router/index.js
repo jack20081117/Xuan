@@ -8,7 +8,7 @@ export default new Router({
         {
             path:'/',
             name:'home',
-            component:require('@/components/Home').default
+            component:require('@/components/Home.vue').default
         },
         {
             path:'*',
