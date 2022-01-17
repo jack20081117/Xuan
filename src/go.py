@@ -16,7 +16,7 @@ class Go(object):
         self.board=data
 
     def getStringInfo(self,x,y):#返回(x,y)点所在的棋串编号
-        #越界 刚才的点在边界
+        #越界 点(x,y)在边界
         if x<0 or x>18 or y<0 or y>18:
             return -1
 
@@ -87,13 +87,15 @@ class Go(object):
             logging.info('combine result:%s'%self.string)
         return None
 
-    def doStep(self,x,y):
+    def doStep(self,x,y):#落子在(x,y)
         if x<0 or x>18 or y<0 or y>18:
-            raise Exception('x,y must be in [0,18]!')
+            logging.error('x,y must be in [0,18]!')
         num=1 if self.isBlack else -1
         self.board[x][y]=num
 
-    def checkStep(self,x,y):
+    def checkStep(self,x,y):#检查(x,y)是否已有棋子
+        if x<0 or x>18 or y<0 or y>18:
+            logging.error('x,y must be in [0,18]!')
         if self.board[x][y]:
             logging.error('不能在已有棋子的位置落子!')
             return False
@@ -106,8 +108,8 @@ class Go(object):
         for direct in directs:
             if 0<=direct['x']<19 and 0<=direct['y']<19:
                 if self.board[direct['x']][direct['y']]==flag:
-                    res=self.checkKill(x,y,flag)
-                    if res:
+                    res=self.checkKill(direct['x'],direct['y'],flag)
+                    if res is not False:
                         killed.append(res)
         return killed
 
@@ -132,7 +134,7 @@ class Go(object):
         logging.info('棋串%d为死棋'%num)
         return num
 
-    def cleanString(self,num):
+    def cleanString(self,num):#把编号为num的棋串从棋盘上删除
         logging.info('clean string 正在删除棋串:%d'%num)
         if num in self.string['black']: color='black'
         elif num in self.string['white']: color='white'
@@ -161,7 +163,7 @@ class Go(object):
                 del L[i]
                 break
         self.board[x][y]=0
-        subString['x'].pop('y')
+        subString[x].pop(y)
 
     @staticmethod
     def transferBoard(board,src,target):
@@ -352,12 +354,13 @@ class Go(object):
         #不需要判断自身死棋或者打劫 因为传进来的棋谱默认合法
         self.isBlack=True if color=='black' else False
         killFlag=1 if color=='black' else -1
+        #需要自己组棋盘
         self.board[x][y]=killFlag
         self.combine(x,y)
-        result=self.doKill(x,y,killFlag)
-        if len(result):
-            for i in range(len(result)):
-                self.cleanString(result[i])
+        killResult=self.doKill(x,y,-killFlag)
+        if len(killResult):
+            for i in range(len(killResult)):
+                self.cleanString(killResult[i])
 
     def returnData(self,success):
         return success,self.board,self.string,self.robX,self.robY
@@ -367,8 +370,9 @@ class Go(object):
         backupBoard=copy.deepcopy(self.board)
         backupString=copy.deepcopy(self.string)
         backupRobX,backupRobY=self.robX,self.robY
-        checkStep=self.checkStep(x,y)
+        checkStep=self.checkStep(x,y)#检查(x,y)是否已有棋子
         if not checkStep:
+            logging.error('GoLogic校验失败!')
             return self.returnData(False)
         #判断自杀逻辑是反过来的
         if color=='black':
@@ -379,15 +383,16 @@ class Go(object):
             self.isBlack=False
             selfKillflag=-1
             killFlag=1
+        #需要自己组棋盘
         self.board[x][y]=selfKillflag
         self.combine(x,y)
-        result=self.doKill(x,y,killFlag)
-        if len(result):
-            for i in range(len(result)):
-                killed=self.cleanString(result[i])
+        killResult=self.doKill(x,y,killFlag)
+        if len(killResult):
+            for i in range(len(killResult)):
+                killed=self.cleanString(killResult[i])
                 if len(killed)==1:
                     #在这里判断打劫
-                    logging.info('GoLogic正在判断打劫,robX=%d,robY=%d,x=%d,y=%d'%(self.robX,self.robY,x,y))
+                    logging.info('GoLogic正在判断打劫,robX={},robY={},x={},y={}'.format(self.robX,self.robY,x,y))
                     if (self.robX is not None and self.robY is not None)\
                     and int(self.robX)==int(x) and int(self.robY)==int(y):
                         logging.error('无法在打劫点落子!')
@@ -395,15 +400,17 @@ class Go(object):
                         self.board=backupBoard
                         self.string=backupString
                         return self.returnData(False)
+                    #如果之前不是打劫点,则更新打劫点
                     self.robX=killed[0]['x']
                     self.robY=killed[0]['y']
-                    logging.info('保存了目前打劫点:x=%d,y=%d'%(self.robX,self.robY))
+                    logging.info('保存了目前打劫点:x={},y={}'.format(self.robX,self.robY))
                 else:
+                    #如果之前有打劫点,则现在清空
                     self.robX=None
                     self.robY=None
         else:
             selfResult=self.checkKill(x,y,selfKillflag)
-            if selfResult:
+            if selfResult:#处理失败 一切还原
                 self.board=backupBoard
                 self.string=backupString
                 self.robX=backupRobX
