@@ -464,8 +464,8 @@ export default {
             this.newGame();
             for(let i=0;i<sgfData.length;i++){
                 let {x,y,color}=sgfData[i];
-                this.goban.push({x,y,color:(color==='black'?1:-1)});
                 x--;y--;
+                this.goban.push({x,y,color:(color==='black'?1:-1)});
                 console.log(`目前是第${i}手,x:${x},y:${y},color:${color}`);
                 this.sgfLogic(x,y,color);
             }
@@ -553,9 +553,7 @@ export default {
             if (this.currentNum!==-1) {
                 this.history=this.history.slice(0,this.currentNum)
                 this.currentNum--;
-            } else {
-                this.history=[];
-            }
+            }else this.history=[];
             this.play();
             this.$Message.success('已修改历史棋谱');
         },

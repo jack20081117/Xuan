@@ -57,11 +57,11 @@ class Xuan(object):
         if dataDict['operator']=='run':
             self.parseStepData(dataDict)
             goban=dataDict['goban']
-            legal,probas,winner=self.doAnalyze(goban)
+            legalMoves,probas,winner=self.doAnalyze(goban)
             return {
                 'code':0,
                 'message':'success',
-                'data':legal
+                'data':legalMoves
             }
         elif dataDict['operator']=='saveGoban':
             goban=dataDict['goban']
@@ -174,6 +174,6 @@ class Xuan(object):
             success,board,string,robX,robY=self.go.GoLogic(x,y,color_text)
             board_list.append(board)
             if success is not True:
-                logging.info("step=%d,x=%d,y=%d,color=%d"%(step,x,y,color))
+                logging.info("step=%s,x=%d,y=%d,color=%d"%(step,x,y,color))
                 raise RuntimeError("组成围棋逻辑出现问题")
         return board,string,robX,robY,board_list
