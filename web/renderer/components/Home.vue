@@ -195,8 +195,8 @@ export default {
         play(out_x,out_y){
             let event=this.event;
             console.log("\n\n\n开始落子...")
-            let tempString=_.cloneDeep(this.string);
-            let tempBoard=_.cloneDeep(this.board);
+            let backupString=_.cloneDeep(this.string);
+            let backupBoard=_.cloneDeep(this.board);
             let x=out_x!==undefined?out_x:event.layerX;
             let y=out_y!==undefined?out_y:event.layerY;
             this.isBlack=(this.lockedBlack===null?this.isBlack:this.lockedBlack);
@@ -225,15 +225,15 @@ export default {
             let killRes=Go.kill(x,y,this.board[x][y]===1?-1:1,this.string,this.board);
             if(killRes.length>0){
                 for(let i=0;i<killRes.length;i++){
-                    let temp=Go.cleanString(killRes[i],this.string,this.board);
-                    let killed=temp.killed;
-                    this.string=temp.string;
-                    this.board=temp.board;
+                    let backup=Go.cleanString(killRes[i],this.string,this.board);
+                    let killed=backup.killed;
+                    this.string=backup.string;
+                    this.board=backup.board;
                     if(killed.length===1){//杀死一个棋子的话可能是打劫,要判断
                         if(x===this.robX&&y===this.robY){
                             this.$Message.error("无法在打劫点落子");
-                            this.string=tempString;
-                            this.board=tempBoard;
+                            this.string=backupString;
+                            this.board=backupBoard;
                             return;
                         }else{//记录打劫点
                             this.robX=killed[0].x;
@@ -250,8 +250,8 @@ export default {
                 let result=Go.checkKill(x,y,this.board[x][y]===1?1:-1,this.string,this.board);
                 if(result!==false){
                     this.$Message.error("无法在导致自己死棋的位置落子!");
-                    this.string=tempString;
-                    this.board=tempBoard;
+                    this.string=backupString;
+                    this.board=backupBoard;
                     return;
                 }
                 this.robX=null;
