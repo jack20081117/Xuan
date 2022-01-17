@@ -560,7 +560,7 @@ export default {
             this.$Message.success('已修改历史棋谱');
         },
         boardControlCancel(){
-            this.$Message.info('暂未修改棋谱');
+            this.$Message.info('取消修改棋谱');
         },
         checkWinner(){
             let res=influence.areaMap(this.board);

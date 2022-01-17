@@ -57,7 +57,8 @@ class Go(object):
                     logging.info("即将删除棋串%s"%subString[s])
                     del subString[s]
 
-    def combine(self,x,y):
+    def combine(self,x,y,isBlack=None):
+        if isBlack is not None:self.isBlack=isBlack
         up,down,left,right=getFourDirect(x,y)
 
         logging.info('get string info...')
@@ -67,10 +68,7 @@ class Go(object):
         sr=self.getStringInfo(right['x'],right['y'])
         logging.info('su={},sd={},sl={},sr={}'.format(su,sd,sl,sr))
 
-        if (su==False or su==-1)\
-        and(sd==False or sd==-1)\
-        and(sl==False or sl==-1)\
-        and(sr==False or sr==-1):
+        if (su==False or su==-1) and (sd==False or sd==-1) and (sl==False or sl==-1) and (sr==False or sr==-1):
             logging.info('combine 检测到需要新增string:',self.string)
             stringNum=self.string['num']
             subString=self.string['black'] if self.isBlack else self.string['white']
@@ -353,11 +351,11 @@ class Go(object):
         #Xuan内部使用的围棋逻辑,即把传进来的坐标转为自己的棋盘信息
         #不需要判断自身死棋或者打劫 因为传进来的棋谱默认合法
         self.isBlack=True if color=='black' else False
-        flag=1 if color=='black' else -1
-        self.board[x][y]=flag
+        killFlag=1 if color=='black' else -1
+        self.board[x][y]=killFlag
         self.combine(x,y)
-        result=self.doKill(x,y,flag)
-        if len(result)>0:
+        result=self.doKill(x,y,killFlag)
+        if len(result):
             for i in range(len(result)):
                 self.cleanString(result[i])
 
@@ -390,10 +388,8 @@ class Go(object):
                 if len(killed)==1:
                     #在这里判断打劫
                     logging.info('GoLogic正在判断打劫,robX=%d,robY=%d,x=%d,y=%d'%(self.robX,self.robY,x,y))
-                    if self.robX is not None\
-                    and self.robY is not None\
-                    and int(self.robX)==int(x)\
-                    and int(self.robY)==int(y):
+                    if (self.robX is not None and self.robY is not None)\
+                    and int(self.robX)==int(x) and int(self.robY)==int(y):
                         logging.error('无法在打劫点落子!')
                         logging.error('GoLogic校验失败!')
                         self.board=backupBoard

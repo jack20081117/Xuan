@@ -123,9 +123,9 @@ class Xuan(object):
         self.board,self.string,self.robX,self.robY,boardList=self.getStringAndBoardFromFront(goban=goban)
         state=self.getPredictData(boardList)
         probas,winner=self.analyze(state)
-        result=self.transferAnalyze2List(probas,winner)
-        legal=self.getLegalMoves(result)
-        return legal,probas,winner
+        resultList=self.transferAnalyze2List(probas,winner)
+        legalMoves=self.getLegalMoves(resultList)
+        return legalMoves,probas,winner
 
     def getLegalMoves(self,allMoves,threshold=5):
         result=[]
