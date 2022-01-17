@@ -58,7 +58,7 @@ export default {
             siteX:19,siteY:19,//当前步位置
             step:"step",//落子样式
             black:"#000000",white:"#FFFFFF",//棋子颜色
-            offsetX:580,offsetY:120,//棋盘偏移量
+            offsetX:290,offsetY:120,//棋盘偏移量
             isBlack:true,//当前是否为黑棋
 
             //canvas
@@ -345,8 +345,8 @@ export default {
             this.context.fillStyle="black";
             for(let key in constant.drawTextSet){
                 let textInfo=constant.drawTextSet[key];
-                this.context.fillText(key,textInfo.x1,textInfo.y1);
-                this.context.fillText(key,textInfo.x2,textInfo.y2);
+                this.context.fillText(key,textInfo.x1-290,textInfo.y1);
+                this.context.fillText(key,textInfo.x2-290,textInfo.y2);
             }
         },
         drawBoard(){
