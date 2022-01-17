@@ -11,7 +11,7 @@ Xuan是一款开源的围棋AI，其名称来源于中国古代围棋名著 **�
 # 开发流程
 可能需要的软件:Pycharm,VS Code,SourceTree
 
-# 安装
+# 安装与运行
 在根目录下有运行文件runfront.bat,runback.bat
 分别为前端与引擎的运行文件.
 
@@ -124,6 +124,29 @@ Xuan是一款开源的围棋AI，其名称来源于中国古代围棋名著 **�
   围棋不允许走棋使自己的棋串处于无气状态，因此未杀棋就需要交给`doKill(x,y)`判断，只是这里的flag颜色标识是判断的自身。
 
   若自身死棋则交给`checkSuicide(x,y)`将刚才的落子从棋串中清除。
+
+# 前端与引擎的通信
+## 通信方式
+前后端通信有两种方式：Tcp和命令行(暂未开发),Tcp传输Json数据。
+## run-分析
+```js
+let data={
+  operator:"run",
+  board:this.board,
+  color:"black",
+  string:this.string,
+  goban:this.goban
+};
+```
+run命令代表前端要求引擎进行分析。
+## saveGoban-保存前端的棋谱
+```js
+let data={
+  operator:"saveGoban",
+  goban:JSON.stringify(this.goban),
+};
+```
+saveGoban命令代表前端要求引擎将这些数据入库保存。
 
 # 神经网络部分
 ## 架构
