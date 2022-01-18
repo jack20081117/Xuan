@@ -15,7 +15,7 @@
     "pack:main": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.main.config.js",
     "pack:renderer": "cross-env NODE_ENV=production webpack --progress --colors --config .electron-vue/webpack.renderer.config.js",
     "postinstall": "",
-    "package-darwin": "electron-packager . Xuan --platform=darwin --arch=x64 --icon=./Xuan.ico --out=./out  --app-version=0.01 --overwrite",
+    "package-darwin": "electron-packager . Xuan --platform=darwin --arch=x64 --icon=./Xuan.ico --out=./out  --app-version=0.01 --overwrite  --ignore=node_modules --ignore=engine",
     "package-win32": "electron-packager . Xuan --platform=win32 --arch=x64 --out=./out --icon=./icon.ico  --app-version=0.01 --overwrite --electron-zip-dir=../"
   },
   "build": {
