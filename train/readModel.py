@@ -63,29 +63,30 @@ def saveFile(fileName,need):
         logging.info("文件解析完毕 保存解析记录...")
         dataCenter.saveCheckedName(fileName)
 
-if file=='del' or file=='delete':
-    delete=input("即将删除所有围棋训练数据 输入[delete]以确认:\n")
-    if delete=='delete':
-        dataCenter.deleteGoData('xuan')
-        logging.info("已删除所有数据")
-    else:
-        logging.info("已取消删除")
-    exit(0)
+if __name__ == '__main__':
+    if file=='del' or file=='delete':
+        delete=input("即将删除所有围棋训练数据 输入[delete]以确认:\n")
+        if delete=='delete':
+            dataCenter.deleteGoData('xuan')
+            logging.info("已删除所有数据")
+        else:
+            logging.info("已取消删除")
+        exit(0)
 
-if file=='count':
-    count=dataCenter.countGoData()
-    count=count[0]
-    logging.info("目前数据库已有{}个棋谱".format(count['count']))
-    exit(0)
+    if file=='count':
+        count=dataCenter.countGoData()
+        count=count[0]
+        logging.info("目前数据库已有{}个棋谱".format(count['count']))
+        exit(0)
 
-try:
-    dirs=os.listdir(file)
-    for single in range(len(dirs)):
-        dirs[single]=file+'/'+dirs[single]
-        saveFile(dirs[single],True)
-except NotADirectoryError:
-    logging.info('检测到文件')
-    saveFile(file,False)
+    try:
+        dirs=os.listdir(file)
+        for single in range(len(dirs)):
+            dirs[single]=file+'/'+dirs[single]
+            saveFile(dirs[single],True)
+    except NotADirectoryError:
+        logging.info('检测到文件')
+        saveFile(file,False)
 
-logging.info("程序处理完毕")
-dataCenter.vaccum()
+    logging.info("程序处理完毕")
+    dataCenter.vaccum()

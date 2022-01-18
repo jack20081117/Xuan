@@ -123,13 +123,13 @@ def saveModel(feature,policy,value,first=False):
             logging.info('保存value网络...')
             torch.save(value,valuePath)
         time=getDatetime()['timestr']
-        os.mkdir(os.path.join('../savedModel', time))
+        os.mkdir(os.path.join('savedModel',time))
         logging.info('保存feature网络...')
-        torch.save(feature, os.path.join('../savedModel', time, 'feature.bin'))
+        torch.save(feature,os.path.join('savedModel',time,'feature.bin'))
         logging.info('保存policy网络...')
-        torch.save(policy, os.path.join('../savedModel', time, 'policy.bin'))
+        torch.save(policy,os.path.join('savedModel',time,'policy.bin'))
         logging.info('保存value网络...')
-        torch.save(value, os.path.join('../savedModel', time, 'value.bin'))
+        torch.save(value,os.path.join('savedModel',time,'value.bin'))
 
         logging.info('保存最新的feature网络...')
         torch.save(feature,featurePath)

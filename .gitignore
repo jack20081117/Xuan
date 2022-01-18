@@ -1,7 +1,8 @@
 .idea
 .vscode
-savedModel
-dataSet
+train/savedModel
+train/dataSet
+train/mnist
 node_modules
 dist/electron/*
 dist/web/*
