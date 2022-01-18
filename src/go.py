@@ -245,22 +245,18 @@ class Go(object):
     def checkWinner(self,board):
         logging.info('checking winner...')
         board=self.transferBoard(board,-1,2)
-        temp=numpy.copy(board)
+        npBoard=numpy.copy(board)
         for item in self.findBlanks(numpy.copy(board)):
-            if not len(item['w_around']) and not len(item['b_around']):
-                value=9
-            elif not len(item['w_around']):
-                value=3
-            elif not len(item['b_around']):
-                value=4
-            else:
-                value=9
+            if not len(item['w_around']) and not len(item['b_around']):value=9
+            elif not len(item['w_around']):value=3
+            elif not len(item['b_around']):value=4
+            else:value=9
             for i,j in item['cross']:
-                temp[i,j]=value
+                npBoard[i,j]=value
 
-        black=temp[temp==1].size+temp[temp==3].size
-        white=temp[temp==2].size+temp[temp==4].size
-        common=temp[temp==9].size
+        black=npBoard[npBoard==1].size+npBoard[npBoard==3].size
+        white=npBoard[npBoard==2].size+npBoard[npBoard==4].size
+        common=npBoard[npBoard==9].size
 
         logging.info('black:%d,white:%d,common:%d'%(black,white,common))
 
@@ -353,11 +349,12 @@ class Go(object):
         #Xuan内部使用的围棋逻辑,即把传进来的坐标转为自己的棋盘信息
         #不需要判断自身死棋或者打劫 因为传进来的棋谱默认合法
         self.isBlack=True if color=='black' else False
-        killFlag=1 if color=='black' else -1
+        selfKillFlag=1 if color=='black' else -1
+        killFlag=-1 if color=='black' else 1
         #需要自己组棋盘
-        self.board[x][y]=killFlag
+        self.board[x][y]=selfKillFlag
         self.combine(x,y)
-        killResult=self.doKill(x,y,-killFlag)
+        killResult=self.doKill(x,y,killFlag)
         if len(killResult):
             for i in range(len(killResult)):
                 self.cleanString(killResult[i])

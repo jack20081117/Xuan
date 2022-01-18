@@ -14,7 +14,7 @@ if __name__ == '__main__':
     result=go.parseAdditionalSgf(example)
     print(result)
 
-    time.sleep(5)
+    time.sleep(1)
 
     go.transferSgf2StringAndBoard(yk_300)
     result_300=go.checkWinner(go.board)

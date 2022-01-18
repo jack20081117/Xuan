@@ -468,6 +468,11 @@ export default {
                 this.goban.push({x,y,color:(color==='black'?1:-1)});
                 console.log(`目前是第${i}手,x:${x},y:${y},color:${color}`);
                 this.sgfLogic(x,y,color);
+                this.history.push({
+                    board:this.board,string:this.string,
+                    robX:this.robX,robY:this.robY,
+                    siteX:this.siteX,siteY:this.siteY
+                });
             }
             console.log("string :>> ",this.string);
             console.log("board :>> ",this.board);
