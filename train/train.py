@@ -106,7 +106,7 @@ def loadModel(inplane,outplane,outplaneMap,block):
         value=torch.load(valuePath,map_location=DEVICE)
         logging.info("从权重文件读取网络成功")
     except Exception as e:
-        logging.error("重建神经网络 原因-> %s", e)
+        logging.error("重建神经网络 原因 :>> %s"%e)
         feature=Extractor(inplane,outplaneMap,block).to(DEVICE)
         policy=PolicyNet(outplaneMap,outplane).to(DEVICE)
         value=ValueNet(outplaneMap,outplane).to(DEVICE)
@@ -139,7 +139,7 @@ def saveModel(feature,policy,value,first=False):
         torch.save(value,valuePath)
 
     except Exception as e:
-        logging.error("保存神经网络失败 原因-> %s",e)
+        logging.error("保存神经网络失败 原因 :>> %s"%e)
         logging.info('保存feature网络...')
         torch.save(feature,featurePath)
         logging.info('保存policy网络...')
