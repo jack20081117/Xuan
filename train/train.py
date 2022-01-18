@@ -19,7 +19,7 @@ from ai.engine import Xuan
 
 osType=platform.system()
 
-log_fileName='./savedModel/trainData.txt'
+log_fileName='./train/savedModel/trainData.txt'
 
 config=CONFIG
 gl['modelPath']=config['model']
@@ -123,13 +123,13 @@ def saveModel(feature,policy,value,first=False):
             logging.info('保存value网络...')
             torch.save(value,valuePath)
         time=getDatetime()['timestr']
-        os.mkdir(os.path.join('savedModel',time))
+        os.mkdir(os.path.join('train/savedModel',time))
         logging.info('保存feature网络...')
-        torch.save(feature,os.path.join('savedModel',time,'feature.bin'))
+        torch.save(feature,os.path.join('train/savedModel',time,'feature.bin'))
         logging.info('保存policy网络...')
-        torch.save(policy,os.path.join('savedModel',time,'policy.bin'))
+        torch.save(policy,os.path.join('train/savedModel',time,'policy.bin'))
         logging.info('保存value网络...')
-        torch.save(value,os.path.join('savedModel',time,'value.bin'))
+        torch.save(value,os.path.join('train/savedModel',time,'value.bin'))
 
         logging.info('保存最新的feature网络...')
         torch.save(feature,featurePath)
@@ -186,7 +186,7 @@ def test(dataSet):
         f.write('\n')
     logging.info('保存数据成功')
 
-def train(dataSet:MyDataset,time:int,testDataSet:list):
+def train(dataSet,time,testDataSet):
     lr=float(config['ai'].get('LR',None))
 
     inplane=int(config['ai'].get('inplane',None))
