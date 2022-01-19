@@ -27,8 +27,8 @@ torch.manual_seed(RANDOM_SEED)
 class CNN(Module):
     def __init__(self):
         super(CNN,self).__init__()
-        self.conv1=nn.Conv2d(1,10,kernel_size=(5,),padding=2,stride=(1,))
-        self.conv2=nn.Conv2d(10,20,kernel_size=(5,),padding=2,stride=(1,))
+        self.conv1=nn.Conv2d(1,10,kernel_size=5,padding=2)
+        self.conv2=nn.Conv2d(10,20,kernel_size=5,padding=2)
 
         self.fc1=nn.Linear(20*28*28,500)
         self.fc2=nn.Linear(500,10)
@@ -76,7 +76,7 @@ def test(model,device,testLoader):
                  100.*correct/len(testLoader.dataset)))
 
 if __name__ == '__main__':
-    trainLoader=DataLoader(torchvision.datasets.MNIST('./mnist/',train=True,download=False,
+    trainLoader=DataLoader(torchvision.datasets.MNIST('./mnist/',train=True,download=True,
                                                       transform=torchvision.transforms.Compose([
                                                           torchvision.transforms.ToTensor(),
                                                           torchvision.transforms.Normalize((0.1307,),(0.3081,))
