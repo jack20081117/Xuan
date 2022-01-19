@@ -1,12 +1,12 @@
 .idea
 .vscode
-savedModel
-dataSet
-mnist
+engine/savedModel
+engine/dataSet
+engine/mnist
 node_modules
-dist/electron/*
-dist/web/*
-static
+front/dist/electron/*
+front/dist/web/*
+front/static
 
 !.gitkeep
 

@@ -1,4 +1,4 @@
-from src.go import Go
+from engine.src.go import Go
 import time
 
 #弈客300手大型棋谱
