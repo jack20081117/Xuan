@@ -19,9 +19,15 @@ class Go(object):
         self.isBlack=True#当前是否为黑方执子
 
     def setBoard(self,board):#直接通过已有的棋盘克隆新棋盘
+        '''
+        :param board:old board
+        '''
         self.board=board
 
     def getStringInfo(self,x,y):#返回(x,y)点所在的棋串编号
+        '''
+        :return:the number of the string where (x,y) is located
+        '''
         #越界 点(x,y)在边界
         if x<0 or x>18 or y<0 or y>18:
             return -1
@@ -44,7 +50,7 @@ class Go(object):
             if s>0 and not isinstance(s,bool):
                 return s
 
-    def combineCurrentString(self,x,y,src,*args):
+    def combineCurrentString(self,x,y,src,*args):#将(x,y)与四周的点所在棋串进行合并
         logging.info("combine current string 处理前 string:",self.string)
         subString=self.string['black'] if self.isBlack else self.string['white']
         if x not in subString:
@@ -54,7 +60,7 @@ class Go(object):
         for s in args:
             if s>0 and s!=src and not isinstance(s,bool):
                 if s in subString:
-                    subString[src].extend(subString[s])
+                    subString[src].extend(subString[s])#合并棋串
                     for key in subString:
                         if key<19:
                             for subkey in subString[key]:
@@ -68,13 +74,15 @@ class Go(object):
         up,down,left,right=getFourDirect(x,y)
 
         logging.info('get string info...')
+        #获取四周的点的棋串编号
         su=self.getStringInfo(up['x'],up['y'])
         sd=self.getStringInfo(down['x'],down['y'])
         sl=self.getStringInfo(left['x'],left['y'])
         sr=self.getStringInfo(right['x'],right['y'])
         logging.info('su={},sd={},sl={},sr={}'.format(su,sd,sl,sr))
 
-        if (su==False or su==-1) and (sd==False or sd==-1) and (sl==False or sl==-1) and (sr==False or sr==-1):
+        if (su is False or su==-1) and (sd is False or sd==-1) and (sl is False or sl==-1) and (sr is False or sr==-1):
+            #四周都不是同色棋子,则新增了一个棋串
             logging.info('combine 检测到需要新增string:',self.string)
             stringNum=self.string['num']
             subString=self.string['black'] if self.isBlack else self.string['white']
@@ -173,6 +181,12 @@ class Go(object):
 
     @staticmethod
     def transferBoard(board,src,target):
+        '''
+        :param board:the old board
+        :param src:the source color,like -1
+        :param target:the target color like 2
+        :return:the new board
+        '''
         for i in range(19):
             for j in range(19):
                 if board[i][j]==src:
@@ -336,19 +350,20 @@ class Go(object):
             success,board,string,robX,robY=self.GoLogic(x,y,color)
             goban.append(board)
             stringList.append(string)
-        RE=additionalSgf['RE']
-        if RE[0]!='W' and RE[0]!='B' and RE[0]!=UNKNOWN:
+        RE=additionalSgf['RE']#游戏结果
+        if RE[0]!='W' and RE[0]!='B' and RE[0]!=UNKNOWN:#棋谱记录了胜者就赋值,没有的话就自己计算
             RE[0]=UNKNOWN
         if RE!=UNKNOWN:
-            winnerc=RE[0]
+            winner=RE[0]
         else:
+            #取出最近一次的棋盘状态 丢给go分析胜率
             latestGoban=copy.deepcopy(goban[-1])
             winResult=self.checkWinner(latestGoban)
-            winnerc='B' if winResult['black']>winResult['white']+KOMI else 'W'
-        winner=[WINNER[winnerc]]
+            winner='B' if winResult['black']>winResult['white']+KOMI else 'W'#黑目比白目+贴目还多,就是黑胜,否则白胜
+        winner=[WINNER[winner]]
         return goban,winner,parsedSgf,stringList
 
-    def parseSgf2NetworkData(self,sgf):
+    def parseSgf2NetworkData(self,sgf):#把单个sgf转为神经网络需要的数据
         sgfDict={'sgf':sgf}
         return self.parseSingleData(sgfDict)
 
@@ -443,12 +458,12 @@ class Go(object):
         return myLast7Boards,oppoLast7Boards
 
     @staticmethod
-    def getDotLife(x,y,board):
+    def getDotLife(x,y,board):#获取棋盘上某个点是否为空
         if x<0 or x>18 or y<0 or y>18:
             return 0
         return 1 if not board[x][y] else 0
 
-    def getStringLife(self,board,L,threshold=4):
+    def getStringLife(self,board,L,threshold=4):#获取这个棋串有多少气,大于threshold就返回-1,不需要讨论
         life=0
         for i in range(len(L)):
             x=L[i]['x']

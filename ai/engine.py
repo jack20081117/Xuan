@@ -99,15 +99,14 @@ class Xuan(object):#围棋AI的核心模块
         state=state.reshape(1,self.inplanes,19,19)
         return state
 
-    def analyze(self,state):
-        print(state)
+    def analyze(self,state):#分析数据结构
         featureMaps=self.feature(state.clone().detach())
         winner=self.value(featureMaps)
         probas=self.policy(featureMaps)
         return probas,winner
 
     @staticmethod
-    def transferAnalyze2List(probas,winner): #将引擎分析的内容转换为前端可读的数据
+    def transferAnalyze2List(probas,winner):#将引擎分析的内容转换为前端可读的数据
         probas=probas.tolist()
         probas=probas[0]
         winner=winner.tolist()
@@ -121,7 +120,7 @@ class Xuan(object):#围棋AI的核心模块
                 'y':y,
                 'probas':singleProbas
             })
-        resultList=sorted(resultList,reverse=True,key=lambda e:e.__getitem__('probas'))
+        resultList=sorted(resultList,reverse=True,key=lambda e:e.__getitem__('probas')) #根据probas从大到小排序(注意reverse=True)
         return resultList
 
     def doAnalyze(self,goban):
