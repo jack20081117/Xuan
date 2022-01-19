@@ -96,9 +96,9 @@ class Xuan(object):
         return state
 
     def analyze(self,state):
-        feature_maps=self.feature(state.clone().detach())
-        winner=self.value(feature_maps)
-        probas=self.policy(feature_maps)
+        featureMaps=self.feature(state.clone().detach())
+        winner=self.value(featureMaps)
+        probas=self.policy(featureMaps)
         return probas,winner
 
     @staticmethod
