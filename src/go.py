@@ -267,9 +267,10 @@ class Go(object):
         }
 
     @staticmethod
-    def parseSgf(sgfData):
+    def parseSgf(sgfData):#解析围棋的sgf文件格式
         #sgf文件格式 W为白 B为黑
-        #类似B[ac];W[dp];...
+        #类似(;B[ac];W[dp];...)
+        #代表黑 第一行 第三列;白 第四行 第十六列
         L=sgfData.split(';')
         result=[]
         for i in range(len(L)):
@@ -287,22 +288,22 @@ class Go(object):
 
     @staticmethod
     def parseAdditionalSgf(sgfData):
-        RE=getSgfInfo(sgfData,'RE','')
-        PB=getSgfInfo(sgfData,'PB','')
-        PW=getSgfInfo(sgfData,'PW','')
-        BR=getSgfInfo(sgfData,'BR','9d')
-        WR=getSgfInfo(sgfData,'WR','9d')
-        KM=getSgfInfo(sgfData,'KM','6.5')
-        AP=getSgfInfo(sgfData,'AP','Xuan')
-        DT=getSgfInfo(sgfData,'DT',getDatetime()['datestr'])
-        RU=getSgfInfo(sgfData,'RU=','chinese')
+        RE=getSgfInfo(sgfData,'RE','')#游戏结果
+        PB=getSgfInfo(sgfData,'PB','')#黑方
+        PW=getSgfInfo(sgfData,'PW','')#白方
+        BR=getSgfInfo(sgfData,'BR','9d')#黑方段位,默认职业九段
+        WR=getSgfInfo(sgfData,'WR','9d')#白方段位,默认职业九段
+        KM=getSgfInfo(sgfData,'KM','6.5')#贴目,默认6.5目
+        AP=getSgfInfo(sgfData,'AP','Xuan')#对弈平台,默认为Xuan
+        DT=getSgfInfo(sgfData,'DT',getDatetime()['datestr'])#对弈时间
+        RU=getSgfInfo(sgfData,'RU=','chinese')#围棋规则,默认中国规则(黑贴6.5子)
         return {
             'RE':RE,'PB':PB,'PW':PW,'BR':BR,'WR':WR,
             'KM':KM,'AP':AP,'DT':DT,'RU':RU
         }
 
     @staticmethod
-    def parseGoban2Sgf(gobanData):
+    def parseGoban2Sgf(gobanData):#把Xuan能识别的棋谱信息(Goban)保存成方便入库的信息(Sgf)
         sgf=''
         for i in range(len(gobanData)):
             x=ALPHABET[int(gobanData[i]['x'])]
@@ -315,7 +316,7 @@ class Go(object):
             'sgf':sgf
         }
 
-    def parseSingleData(self,data):
+    def parseSingleData(self,data):#解析数据集传来的Sgf
         sgf=data['sgf']
         self.__init__()
         parsedSgf=self.parseSgf(sgf)
@@ -417,23 +418,23 @@ class Go(object):
         logging.info('GoLogic校验成功!')
         return self.returnData(True)
 
-    def getLastBoard(self,boardList,index,myColor,oppoColor):
-        myLast=[]
-        oppoLast=[]
+    def getLastBoard(self,boardList,index,myColor,oppoColor):#获取最近的7步棋
+        myLast7Boards=[]
+        oppoLast7Boards=[]
         start=index-7
         for i in range(7):
             if start<0 or start>len(boardList):
-                empty=getEmptyBoard()
-                myLast.append(empty)
-                oppoLast.append(empty)
+                emptyBoard=getEmptyBoard()
+                myLast7Boards.append(emptyBoard)
+                oppoLast7Boards.append(emptyBoard)
             else:
                 currentBoard=boardList[start]
                 myBoard=self.setBoardByColor(copy.deepcopy(currentBoard),myColor)
                 oppoBoard=self.setBoardByColor(copy.deepcopy(currentBoard),oppoColor)
-                myLast.append(myBoard)
-                oppoLast.append(oppoBoard)
+                myLast7Boards.append(myBoard)
+                oppoLast7Boards.append(oppoBoard)
             start+=1
-        return myLast,oppoLast
+        return myLast7Boards,oppoLast7Boards
 
     @staticmethod
     def getDotLife(x,y,board):
@@ -502,7 +503,7 @@ class Go(object):
         return myBoard,oppoBoard,myLifeBoard,oppoLifeBoard
 
     @staticmethod
-    def setBoardByArray(board,array,color):
+    def setBoardByArray(board,array,color):#根据传入的参数更新棋盘
         for i in range(len(array)):
             x=array[i]['x']
             y=array[i]['y']
@@ -510,7 +511,7 @@ class Go(object):
         return board
 
     @staticmethod
-    def setBoardByColor(board,color):
+    def setBoardByColor(board,color):#让棋盘只留下某个颜色
         for i in range(19):
             for j in range(19):
                 if board[i][j]!=color:
@@ -518,14 +519,14 @@ class Go(object):
         return board
 
     @staticmethod
-    def getColorNumByText(text):
+    def getColorNumByText(text):#传入颜色文字转数字
         return 1 if text=='black' else 0
 
     @staticmethod
-    def getColorTextByNum(num):
+    def getColorTextByNum(num):#传入颜色数字转文字
         return 'black' if num==1 else 'white'
 
-    def getCurrentColorBoard(self,num):
+    def getCurrentColorBoard(self,num):#当前是黑色,就全1,否则全0
         board=getEmptyBoard()
         for i in range(19):
             for j in range(19):
@@ -533,7 +534,7 @@ class Go(object):
         return board
 
     @staticmethod
-    def getMyOppoBoard(board,mycolor,oppocolor):
+    def getMyOppoBoard(board,mycolor,oppocolor):#获取自己和对手的棋盘,数字全是1
         myboard=copy.deepcopy(board)
         oppoboard=copy.deepcopy(board)
         for i in range(19):
