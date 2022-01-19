@@ -1,7 +1,4 @@
-from src.go import Go
-
 import torch
-from torch.utils.data import TensorDataset
 from torch.utils.data import Dataset
 
 DEVICE=torch.device("cuda" if torch.cuda.is_available() else "cpu")

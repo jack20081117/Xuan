@@ -1,5 +1,5 @@
-from src.tools import *
-from config import *
+from engine.src.tools import *
+from engine.config import *
 
 import numpy,logging,json,copy
 logging.basicConfig(level=logging.INFO)

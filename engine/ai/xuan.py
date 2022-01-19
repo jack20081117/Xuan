@@ -1,9 +1,9 @@
 import copy,torch, json,logging
 
-from ai.datacenter import DataCenter
-from config import GLOBAL_DICT as gl
-from src.go import Go
-from src.tools import *
+from engine.ai.datacenter import DataCenter
+from engine.config import GLOBAL_DICT as gl
+from engine.src.go import Go
+from engine.src.tools import *
 
 DEVICE=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 

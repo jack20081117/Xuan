@@ -1,8 +1,7 @@
-import configparser,json,os,logging
-from src.tools import *
-from src.net import Server
-from config import GLOBAL_DICT as gl
-from config import *
+import os,logging
+from engine.src.net import Server
+from engine.config import GLOBAL_DICT as gl
+from engine.config import *
 
 filePath='./config.ini'
 

@@ -1,21 +1,18 @@
-import copy,json,os,logging
-from config import *
-from src.net import Server
-from database.db import Database
-from config import GLOBAL_DICT as gl
-from src.tools import *
-from src.go import Go
-from ai.datacenter import DataCenter
-from ai.dataset import MyDataset
-import torch.nn as nn
-from torch.utils.data import TensorDataset,DataLoader
-import torch,random,numpy,platform
+import json,os,logging
+from engine.config import *
+from engine.config import GLOBAL_DICT as gl
+from engine.src.tools import *
+from engine.src.go import Go
+from engine.ai.datacenter import DataCenter
+from engine.ai.dataset import MyDataset
+from torch.utils.data import DataLoader
+import torch,numpy,platform
 
-from model.loss import Loss
-from model.policy import PolicyNet
-from model.value import ValueNet
-from model.feature import Extractor
-from ai.engine import Xuan
+from engine.model.loss import Loss
+from engine.model.policy import PolicyNet
+from engine.model.value import ValueNet
+from engine.model.feature import Extractor
+from engine.ai.xuan import Xuan
 
 osType=platform.system()
 

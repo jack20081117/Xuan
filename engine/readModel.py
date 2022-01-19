@@ -1,8 +1,8 @@
 import sqlite3,sys,os,logging
-from src.go import Go
-from ai.datacenter import DataCenter
-from config import *
-from config import GLOBAL_DICT as gl
+from engine.src.go import Go
+from engine.ai.datacenter import DataCenter
+from engine.config import *
+from engine.config import GLOBAL_DICT as gl
 
 config=CONFIG
 port=config['tcp']['port']
