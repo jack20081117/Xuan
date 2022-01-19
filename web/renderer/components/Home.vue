@@ -38,7 +38,9 @@ import * as constant from './constant.js';
 
 let sound=document.body.appendChild(document.createElement("span"));
 sound.play=function(){
-    this.innerHTML="<embed src='play.wav' />";
+    this.innerHTML="<embed src='play.wav' id='sound'/>";
+    document.getElementById("sound").style.display='block';
+    document.getElementById("sound").style.display='none';
 }
 
 export default {

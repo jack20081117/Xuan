@@ -5,6 +5,12 @@ import numpy,logging,json,copy
 logging.basicConfig(level=logging.INFO)
 
 class Go(object):
+    board=None#棋盘
+    string=None#棋串
+    robX=None#打劫点X
+    robY=None#打劫点Y
+    isBlack=True#目前是谁在走子(默认黑先)
+
     def __init__(self):
         self.board=getEmptyBoard()
         self.string=getEmptyString()
@@ -12,8 +18,8 @@ class Go(object):
         self.robY=None#当前打劫点的y坐标
         self.isBlack=True#当前是否为黑方执子
 
-    def setBoard(self,data):
-        self.board=data
+    def setBoard(self,board):#直接通过已有的棋盘克隆新棋盘
+        self.board=board
 
     def getStringInfo(self,x,y):#返回(x,y)点所在的棋串编号
         #越界 点(x,y)在边界
