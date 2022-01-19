@@ -22,7 +22,7 @@ osType=platform.system()
 log_fileName='./train/savedModel/trainData.txt'
 
 config=CONFIG
-gl['modelPath']=config['model']
+gl['model_path']=config['model']
 gl['ai']=config['ai']
 DEVICE=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 logging.info("DEVICE=%s"%DEVICE)
@@ -113,9 +113,9 @@ def loadModel(inplane,outplane,outplaneMap,block):
         saveModel(feature,policy,value,True)
     return feature,policy,value
 
-def saveModel(feature,policy,value,first=False):
+def saveModel(feature,policy,value,saveFirst=False):
     try:
-        if first is True:
+        if saveFirst is True:
             logging.info('保存feature网络...')
             torch.save(feature,featurePath)
             logging.info('保存policy网络...')

@@ -20,8 +20,8 @@ class Xuan(object):
     policy=None
     value=None
     device=None
-    ai_config=None
-    model_path_config=None
+    aiConfig=None
+    modelPathConfig=None
     inplanes=None
 
     def __init__(self):
@@ -34,15 +34,15 @@ class Xuan(object):
 
     def getModel(self):
         logging.info('DEVICE=%s'%DEVICE)
-        self.ai_config=gl.get('ai',None)
-        self.model_path_config=gl.get('model_path',None)
-        self.inplanes=int(self.ai_config['inplane'])
-        feature_path=self.model_path_config['feature']
-        policy_path=self.model_path_config['policy']
-        value_path=self.model_path_config['value']
-        self.feature=torch.load(feature_path,map_location=DEVICE)
-        self.policy=torch.load(policy_path,map_location=DEVICE)
-        self.value=torch.load(value_path,map_location=DEVICE)
+        self.aiConfig=gl.get('ai',None)
+        self.modelPathConfig=gl.get('model_path',None)
+        self.inplanes=int(self.aiConfig['inplane'])
+        featurePath=self.modelPathConfig['feature']
+        policyPath=self.modelPathConfig['policy']
+        valuePath=self.modelPathConfig['value']
+        self.feature=torch.load(featurePath,map_location=DEVICE)
+        self.policy=torch.load(policyPath,map_location=DEVICE)
+        self.value=torch.load(valuePath,map_location=DEVICE)
         logging.info("获取神经网络权重成功")
 
     def parseBoard2Tensor(self,option):
@@ -162,18 +162,18 @@ class Xuan(object):
         string=None
         robX=None
         robY=None
-        board_list=[]
+        boardList=[]
         if len(goban)==0:
-            return getEmptyBoard(),getEmptyString(),None,None,board_list
+            return getEmptyBoard(),getEmptyString(),None,None,boardList
         for i in range(len(goban)):
             step=goban[i]
             x=step['x']
             y=step['y']
             color=step['color']
-            color_text=self.go.getColorTextByNum(color)
-            success,board,string,robX,robY=self.go.GoLogic(x,y,color_text)
-            board_list.append(board)
+            colorText=self.go.getColorTextByNum(color)
+            success,board,string,robX,robY=self.go.GoLogic(x,y,colorText)
+            boardList.append(board)
             if success is not True:
                 logging.info("step=%s,x=%d,y=%d,color=%d"%(step,x,y,color))
                 raise RuntimeError("组成围棋逻辑出现问题")
-        return board,string,robX,robY,board_list
+        return board,string,robX,robY,boardList
