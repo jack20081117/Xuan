@@ -3,7 +3,7 @@
 engine/savedModel
 engine/dataSet
 engine/mnist
-node_modules
+front/node_modules
 front/dist/electron/*
 front/dist/web/*
 front/static
