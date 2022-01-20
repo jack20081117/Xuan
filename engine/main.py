@@ -40,7 +40,7 @@ if __name__ == '__main__':
 
     gl['model']=model
     gl['ai']=config['ai']
-    gl['model_path']=config['model']
+    gl['modelPath']=config['model']
 
     if port is None:
         logging.warning('缺少端口号')

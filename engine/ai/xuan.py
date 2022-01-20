@@ -36,7 +36,7 @@ class Xuan(object):#围棋AI的核心模块
     def getModel(self):#获取神经网络
         logging.info('DEVICE=%s'%DEVICE)
         self.aiConfig=gl.get('ai',None)
-        self.modelPathConfig=gl.get('model_path',None)
+        self.modelPathConfig=gl.get('modelPath',None)
         self.inplanes=int(self.aiConfig['inplane'])
         featurePath=self.modelPathConfig['feature']
         policyPath=self.modelPathConfig['policy']

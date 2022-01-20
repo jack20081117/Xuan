@@ -70,7 +70,8 @@
                 <TabPane label="导入sgf文本" name="sgfText">
                     <Input v-model="sgfText" type="textarea" :rows="4" placeholder="在此处粘贴SGF"/>
                 </TabPane>
-                <TabPane label="导入sgf棋谱文件" name="sgfFile" disabled="">
+                <TabPane label="导入sgf棋谱文件" name="sgfFile">
+                    <Input v-model="sgfText" type="textarea" :rows="4" placeholder="暂不支持此操作"/>
                 </TabPane>
             </Tabs>
         </Modal>
