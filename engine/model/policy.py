@@ -8,7 +8,7 @@ class PolicyNet(Module):
     def __init__(self,inplanes,outplanes):
         super(PolicyNet,self).__init__()
         self.outplanes=outplanes
-        self.conv=nn.Conv2d(inplanes,1,kernel_size=1,stride=1)
+        self.conv=nn.Conv2d(inplanes,1,kernel_size=1)
         self.bn=nn.BatchNorm2d(1)
         self.logSoftMax=nn.LogSoftmax(dim=1)
         self.fc=nn.Linear(outplanes,outplanes)
