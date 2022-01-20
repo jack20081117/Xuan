@@ -14,7 +14,7 @@ class ValueNet(Module):
     def __init__(self,inplanes,outplanes):
         super(ValueNet,self).__init__()
         self.outplanes=outplanes
-        self.conv=nn.Conv2d(inplanes,1,kernel_size=1)
+        self.conv=nn.Conv2d(inplanes,1,kernel_size=1,stride=1)
         self.bn=nn.BatchNorm2d(1)
         self.fc1=nn.Linear(outplanes,256)
         self.fc2=nn.Linear(256,1)
