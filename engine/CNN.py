@@ -74,7 +74,7 @@ def test(model,device,testLoader):
                  100.*correct/len(testLoader.dataset)))
 
 if __name__ == '__main__':
-    trainLoader=DataLoader(torchvision.datasets.MNIST('./mnist/',train=True,download=True,
+    trainLoader=DataLoader(torchvision.datasets.MNIST('./mnist/',train=True,download=False,
                                                       transform=torchvision.transforms.Compose([
                                                           torchvision.transforms.ToTensor(),
                                                           torchvision.transforms.Normalize((0.1307,),(0.3081,))
@@ -85,14 +85,14 @@ if __name__ == '__main__':
                                                           torchvision.transforms.Normalize((0.1307,),(0.3081,))
                                                       ])),batch_size=BATCHSIZETEST,shuffle=True)
     examples=enumerate(testLoader)
-    batchIdx,(example_data,example_targets)=next(examples)
+    batchIdx,(exampleData,exampleTargets)=next(examples)
     network=CNN()
     model=network.to(DEVICE)
     optimizer=optim.SGD(model.parameters(),lr=LR,momentum=MOMENTUM)
 
-    train_losses=[]
-    train_counter=[]
-    test_losses=[]
+    trainLosses=[]
+    trainCounter=[]
+    testLosses=[]
 
     for epoch in range(1,EPOCH+1):
         train(model,DEVICE,trainLoader,optimizer,epoch)
