@@ -25,6 +25,7 @@ class ValueNet(Module):
         :return:probability of the current agent winning the game,considering the actual state of the board
         '''
         x=functional.relu(self.bn(self.conv(x)))
+        #torch.Size([16,1,19,19])
         x=x.view(-1,self.outplanes)
         x=functional.relu(self.fc1(x))
         winner=torch.tanh(self.fc2(x))

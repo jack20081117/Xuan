@@ -3,8 +3,6 @@ from engine.src.net import Server
 from engine.config import GLOBAL_DICT as gl
 from engine.config import *
 
-filePath='./config.ini'
-
 def hello():
     print('''
     X     X
@@ -43,8 +41,8 @@ if __name__ == '__main__':
     gl['modelPath']=config['model']
 
     if port is None:
-        logging.warning('缺少端口号')
-        raise Exception
+        logging.warning('缺少端口号!')
+        exit(1)
 
     hello()
     net=Server()
