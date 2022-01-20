@@ -22,11 +22,10 @@ class ValueNet(Module):
     def forward(self,x):
         '''
         :param x:feature maps extracted from the state
-        :return:probability of the current agent winning the game
-                considering the actual state of the board
+        :return:probability of the current agent winning the game,considering the actual state of the board
         '''
         x=functional.relu(self.bn(self.conv(x)))
         x=x.view(-1,self.outplanes)
         x=functional.relu(self.fc1(x))
-        winning=torch.tanh(self.fc2(x))
-        return winning
+        winner=torch.tanh(self.fc2(x))
+        return winner
