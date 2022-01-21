@@ -16,7 +16,7 @@ from ai.xuan import Xuan
 
 osType=platform.system()
 
-log_fileName='./train/savedModel/trainData.txt'
+logFileName='./savedModel/trainData.txt'
 
 config=CONFIG
 gl['model_path']=config['model']
@@ -120,13 +120,13 @@ def saveModel(feature,policy,value,saveFirst=False):
             logging.info('保存value网络...')
             torch.save(value,valuePath)
         time=getDatetime()['timestr']
-        os.mkdir(os.path.join('train/savedModel',time))
+        os.mkdir(os.path.join('savedModel',time))
         logging.info('保存feature网络...')
-        torch.save(feature,os.path.join('train/savedModel',time,'feature.bin'))
+        torch.save(feature,os.path.join('savedModel',time,'feature.bin'))
         logging.info('保存policy网络...')
-        torch.save(policy,os.path.join('train/savedModel',time,'policy.bin'))
+        torch.save(policy,os.path.join('savedModel',time,'policy.bin'))
         logging.info('保存value网络...')
-        torch.save(value,os.path.join('train/savedModel',time,'value.bin'))
+        torch.save(value,os.path.join('savedModel',time,'value.bin'))
 
         logging.info('保存最新的feature网络...')
         torch.save(feature,featurePath)
@@ -175,7 +175,7 @@ def test(dataSet):
             'percent':correctPercent
         })
     logging.info('accuracy:%s'%accuracy)
-    with open(log_fileName,encoding='utf-8',mode='a+') as f:
+    with open(logFileName,encoding='utf-8',mode='a+') as f:
         f.write(json.dumps({
             'type':'accuracy',
             'data':accuracy
@@ -250,7 +250,7 @@ def train(dataSet,time,testDataSet):
         logging.info("Average backward pass->{}".format(numpy.mean(batchLoss)))
         epochLoss.append(numpy.mean(batchLoss))
         logging.info("Epoch loss:{}".format(epochLoss))
-        with open(log_fileName,encoding='utf-8',mode='a+') as f:
+        with open(logFileName,encoding='utf-8',mode='a+') as f:
             f.write(json.dumps({
                 'type':'loss',
                 'data':batchLoss
