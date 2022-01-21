@@ -128,7 +128,8 @@ export default {
                 this.$Message.error("引擎传输数据格式错误!");
             }
             let probas=result.data;
-            let best=probas[0];
+            let num=Math.ceil(Math.random()*1000000)%9;
+            let best=probas[num];
             let x=best.x,y=best.y;
             console.log("引擎选点 :>> ",x,y);
             this.play(x,y);
