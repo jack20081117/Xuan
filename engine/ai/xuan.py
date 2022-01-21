@@ -108,7 +108,7 @@ class Xuan(object):#围棋AI的核心模块
     @staticmethod
     def transferAnalyze2List(probas,winner):#将引擎分析的内容转换为前端可读的数据
         probas=probas.tolist()
-        probas=probas[0]
+        probas=probas[0]#因为获取的是[[]],所以拿第一个
         winner=winner.tolist()
         resultList=[]
         for i in range(len(probas)):
@@ -124,7 +124,6 @@ class Xuan(object):#围棋AI的核心模块
         return resultList
 
     def doAnalyze(self,goban):
-        #棋盘数据转张量,参数int或float,不传默认int
         self.board,self.string,self.robX,self.robY,boardList=self.getStringAndBoardFromFront(goban=goban)
         state=self.getPredictData(boardList)
 
