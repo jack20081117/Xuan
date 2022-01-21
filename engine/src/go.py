@@ -563,3 +563,11 @@ class Go(object):
                 myboard[i][j]=1 if myboard[i][j]==mycolor else 0
                 oppoboard[i][j]=1 if oppoboard[i][j]==oppocolor else 0
         return myboard,oppoboard
+
+    @staticmethod
+    def reverseColor(color):#转换颜色
+        return -1 if color==1 else 1
+
+    @staticmethod
+    def reverseColorText(text):
+        return 'white' if text=='black' else 'black'
