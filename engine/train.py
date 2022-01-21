@@ -240,7 +240,7 @@ def train(dataSet,time,testDataSet):
                 batchWinnerList.append(wList[0])
             batchLoss.append(numpy.mean(singleLoss))
             epochWinnerList.append(numpy.mean(batchWinnerList))
-            logging.info( "当前epoch=[%d] 共[%d]个,index=[%d] 到[%d]结束训练 批次loss=%d,time=%d"
+            logging.info( "当前epoch=[%d] 共[%d]个,index=[%d] 到[%d]结束训练 批次loss=%s,time=%d"
                           %(i+1,EPOCH,batchID+1,time,numpy.mean(singleLoss),getDatetime()['timeformat']))
         logging.info("训练完一个epoch,开始测试")
         try:
