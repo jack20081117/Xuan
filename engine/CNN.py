@@ -5,7 +5,7 @@ from torch.utils.data import DataLoader
 import torch,torchvision
 import torch.optim as optim
 import logging
-from engine.config import *
+from config import *
 
 DEVICE=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 config=CONFIG

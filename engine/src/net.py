@@ -1,6 +1,6 @@
 import json,socket,threading,logging
-from engine.src.tools import *
-from engine.ai.xuan import Xuan
+from src.tools import *
+from ai.xuan import Xuan
 
 class Server(object):
     xuan=None

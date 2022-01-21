@@ -1,7 +1,7 @@
 import os,logging
-from engine.src.net import Server
-from engine.config import GLOBAL_DICT as gl
-from engine.config import *
+from src.net import Server
+from config import GLOBAL_DICT as gl
+from config import *
 
 def hello():
     print('''
