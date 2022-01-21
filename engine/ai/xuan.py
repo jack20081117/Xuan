@@ -134,7 +134,7 @@ class Xuan(object):#围棋AI的核心模块
         return legalMoves,probas,winner
 
     def getLegalMoves(self,allMoves,threshold=5):#获取合法的落子点,默认取5个
-        threshold=int(self.aiConfig['THERSHOLD'])
+        threshold=int(self.aiConfig['THRESHOLD'])
         result=[]
         nums=0
         illegals=[]
