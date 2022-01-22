@@ -1,3 +1,15 @@
+--把这些语句放到python自带的sqlite3中运行吧
+
+-- >>> import sqlite3
+-- >>> ...
+-- >>> cursor.execute('''
+-- ... CREATE TABLE "goData"
+-- ... (
+-- ... ...
+-- ... );
+-- ... ''')
+-- >>> ...
+
 CREATE TABLE "goData"
 (
     id INTEGER
