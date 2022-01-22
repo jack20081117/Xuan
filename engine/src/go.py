@@ -195,7 +195,7 @@ class Go(object):
 
     def transferSgf2StringAndBoard(self,sgfData):
         self.__init__()
-        data=self.parseSgf(sgfData)
+        data=self.parseSgf2Goban(sgfData)
         for i in range(len(data)):
             singleData=data[i]
             x,y,color=singleData['x'],singleData['y'],singleData['color']
@@ -287,7 +287,7 @@ class Go(object):
         }
 
     @staticmethod
-    def parseSgf(sgfData):#解析围棋的sgf文件格式
+    def parseSgf2Goban(sgfData):#解析围棋的sgf文件格式,把方便入库的信息(Sgf)保存成Xuan能识别的棋谱信息(Goban)
         #sgf文件格式 W为白 B为黑
         #类似(;B[ac];W[dp];...)
         #代表黑 第一行 第三列;白 第四行 第十六列
@@ -297,7 +297,7 @@ class Go(object):
             step=L[i]
             if step[0] in COLOR_DICT and step[2] in ALPHABET and step[3] in ALPHABET:
                 color=COLOR_DICT[step[0]]
-                x=ALPHABET[step[2]]-1
+                x=ALPHABET[step[2]]-1#Goban的x,y坐标为0-18,需要减1
                 y=ALPHABET[step[3]]-1
                 result.append({
                     "color":color,
@@ -326,7 +326,7 @@ class Go(object):
     def parseGoban2Sgf(gobanData):#把Xuan能识别的棋谱信息(Goban)保存成方便入库的信息(Sgf)
         sgf=''
         for i in range(len(gobanData)):
-            x=ALPHABET[int(gobanData[i]['x'])+1]
+            x=ALPHABET[int(gobanData[i]['x'])+1]#Sgf的x,y坐标为a-s,对应1-19,查询时需要加1
             y=ALPHABET[int(gobanData[i]['y'])+1]
             color=COLOR_DICT[int(gobanData[i]['color'])]
             temp='%s[%s%s];'%(color,x,y)
@@ -339,7 +339,7 @@ class Go(object):
     def parseSingleData(self,data):#解析数据集传来的Sgf
         sgf=data['sgf']
         self.__init__()
-        parsedSgf=self.parseSgf(sgf)
+        parsedSgf=self.parseSgf2Goban(sgf)
         additionalSgf=self.parseAdditionalSgf(sgf)
         goban=[]
         stringList=[]
