@@ -32,14 +32,14 @@ class DataCenter(object):
         }
 
     def checkFileName(self,name):
-        sql=selectFileRead.format(name)
+        sql=selectCountFileRead.format(name)
         data=self.database.select(sql)
-        return data
+        return {'count':data}
 
     def countGoData(self):
-        sql=selectGoData
+        sql=selectCountGoData
         data=self.database.select(sql)
-        return data
+        return {'count':data}
 
     def saveCheckedName(self,name):
         sql=insertFileRead.format(name)

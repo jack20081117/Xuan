@@ -1,8 +1,8 @@
 import sqlite3,sys,os,logging
-from engine.src.go import Go
-from engine.ai.datacenter import DataCenter
-from engine.config import *
-from engine.config import GLOBAL_DICT as gl
+from src.go import Go
+from ai.datacenter import DataCenter
+from config import *
+from config import GLOBAL_DICT as gl
 
 config=CONFIG
 port=config['tcp']['port']
@@ -27,8 +27,8 @@ def combine(data:str):
 
 def saveFile(fileName,need):
     select=dataCenter.checkFileName(fileName)
-    select=select[0]
-    if int(select['count']):
+    select=select['count']
+    if int(select[0][0]):
         logging.info("该文件=[%s]已被解析过"%fileName)
         dataCenter.vaccum()
         if need is True:
@@ -36,12 +36,8 @@ def saveFile(fileName,need):
         exit(0)
     logging.info("正在解析%s"%fileName)
     go=Go()
-    with open(fileName,'r',encoding='UTF-8') as f:
-        try:
-            line=f.read()
-        except UnicodeError:
-            logging.error("文件编码错误!")
-            return None
+    with open(fileName,'r',encoding='UTF-8',errors='ignore') as f:
+        line=f.read()
         if need is True:
             line=combine(line)
         line=line.split('\n')
@@ -75,8 +71,9 @@ if __name__ == '__main__':
 
     if file=='count':
         count=dataCenter.countGoData()
-        count=count[0]
-        logging.info("目前数据库已有{}个棋谱".format(count['count']))
+        count=count['count']
+        count=count[0][0]
+        logging.info("目前数据库已有{}个棋谱".format(count))
         exit(0)
 
     try:
