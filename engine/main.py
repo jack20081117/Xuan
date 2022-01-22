@@ -6,12 +6,12 @@ from config import *
 def hello():
     print('''
     X     X
-     X   X   U     U     A     N    N
-      X X    U     U    A A    NN   N
-       X     U     U   A   A   N N  N
-      X X    U     U  A AAA A  N  N N
-     X   X    U   U   A     A  N   NN
-    X     X    UUU    A     A  N    N
+     XX XX   UU   UU     A     NN   N
+      XXX    UU   UU    AAA    NNN  N
+       X     UU   UU   AA AA   N NN N
+      XXX    UU   UU  AAAAAAA  N NN N
+     XX XX   UUU UUU  AA   AA  N  NNN
+    X     X   UUUUU   AA   AA  N   NN
     ''')
     print("This is Jack Zhang's AI architecture.")
     print("Copyright 2021-2025.All rights deserved.")

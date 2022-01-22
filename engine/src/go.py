@@ -326,8 +326,8 @@ class Go(object):
     def parseGoban2Sgf(gobanData):#把Xuan能识别的棋谱信息(Goban)保存成方便入库的信息(Sgf)
         sgf=''
         for i in range(len(gobanData)):
-            x=ALPHABET[int(gobanData[i]['x'])]
-            y=ALPHABET[int(gobanData[i]['y'])]
+            x=ALPHABET[int(gobanData[i]['x'])+1]
+            y=ALPHABET[int(gobanData[i]['y'])+1]
             color=COLOR_DICT[int(gobanData[i]['color'])]
             temp='%s[%s%s];'%(color,x,y)
             sgf+=temp
