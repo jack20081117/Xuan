@@ -1,6 +1,10 @@
 import sqlite3
 
 class Database(object):
+    filename=None
+    conn=None
+    cur=None
+
     def init(self,name):
         self.filename=name
         self.conn=sqlite3.connect(self.filename,check_same_thread=False)

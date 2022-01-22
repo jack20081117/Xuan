@@ -73,8 +73,8 @@ class Xuan(object):#围棋AI的核心模块
                     'message':"空棋谱不进行处理"
                 }
             goban=json.loads(goban)
-            parsedSgf=self.go.parseGoban2Sgf(goban)
-            additional=self.go.parseAdditionalSgf(goban)
+            parsedSgf=self.go.parseGoban2Sgf(goban)['sgf']
+            additional=self.go.parseAdditionalSgf(parsedSgf)
             result=self.datacenter.saveGoban(parsedSgf,additional)
             return result
 

@@ -12,6 +12,7 @@ class DataCenter(object):
     def __init__(self):
         self.database=Database()
         self.databasePath=gl.get('dbpath',None)
+        self.database.init(self.databasePath)
         self.model=gl.get('model',None)
 
     def getGoban(self):

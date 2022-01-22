@@ -51,8 +51,8 @@
         <Tooltip content="编辑软件配置">
             <Button type="info" shape="circle" @click="setup()">修改配置</Button>
         </Tooltip>
-        <Tooltip content="暂时废弃">
-            <Button type="success" shape="circle" disabled @click="saveGoban()">保存对局信息</Button>
+        <Tooltip content="将当前局面交由Xuan进行保存">
+            <Button type="primary" shape="circle" @click="saveGoban()">保存对局信息</Button>
         </Tooltip>
         <Tooltip content="进行形式判断">
             <Button type="info" shape="circle" @click="boardAnalyze()">形式判断</Button>
