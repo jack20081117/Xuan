@@ -1,0 +1,185 @@
+#国际象棋的棋盘大小,只能是8
+BOARD_SIZE=8
+
+ALPHABET={#字母与数字对照表
+    'a':1,'b':2,'c':3,'d':4,'e':5,'f':6,'g':7,'h':8,
+    1:1,2:2,3:3,4:4,5:5,6:6,7:7,8:8,
+    '1':1,'2':2,'3':3,'4':4,'5':5,'6':6,'7':7,'8':8,
+}
+
+VALUE_DICT={
+    'S':100,'s':-100,#兵
+    'H':300,'h':-300,#马
+    'E':325,'e':-325,#象
+    'C':500,'c':-500,#车
+    'Q':900,'q':-900,#王后
+    'K':0,'k':0,#国王是无价的
+    '.':0,' ':0#空格
+}
+
+PIECES={#白色大写,黑色小写
+    'WHITE_SOLDIER':'S',
+    'WHITE_CAR':'C',
+    'WHITE_ELEPHANT':'E',
+    'WHITE_HORSE':'H',
+    'WHITE_QUEEN':'Q',
+    'WHITE_KING':'K',
+    'BLACK_SOLDIER':'s',
+    'BLACK_CAR':'c',
+    'BLACK_ELEPHANT':'e',
+    'BLACK_HORSE':'h',
+    'BLACK_QUEEN':'q',
+    'BLACK_KING':'k',
+    'EMPTY':'.'
+}
+
+#棋盘位置对应的顺序,chess不是按下标排序的,而是白棋在下面
+BOARD_PLACE=[
+    [56,57,58,59,60,61,62,63],
+    [48,49,50,51,52,53,54,55],
+    [40,41,42,43,44,45,46,47],
+    [32,33,34,35,36,37,38,39],
+    [24,25,26,27,28,29,30,31],
+    [16,17,18,19,20,21,22,23],
+    [8,9,10,11,12,13,14,15],
+    [0,1,2,3,4,5,6,7]
+]
+
+#颜色枚举,和chess库保持一致
+WHITE=True
+BLACK=False
+
+#当前对局的时间进程:开局,中局,残局
+OPEN_GAME="OG"
+MIDDLE_GAME="MG"
+END_GAME="EG"
+
+#开局时兵和轻子的阈值
+OPEN_SOLDIER_THRESHOLD=7
+OPEN_SOLDIER_LIGHT_THRESHOLD=3
+
+#残局的阈值
+END_LIGHT_THRESHOLD=2
+END_CAR_THRESHOLD=2
+
+#叠兵问题,开局和残局影响较小,中局最大
+SOLDIER_PILED_SET={
+    'OG':{
+        'attacked':-50,
+        'normal':-20,
+        'attackAndProtected':-25,
+        #开局被保护的叠兵扣减的少
+        'protected':-20
+    },
+    'MG':{
+        'attacked':-70,
+        'normal':-35,
+        'attackAndPprotected':-35,
+        'protected':-15
+    },
+    'EG':{
+        'attacked':-50,
+        'normal':-20,
+        'attackAndProtected':-25,
+        'protected':-15
+    },
+}
+
+#不能王车易位出来的车
+BAD_CAR_SET={
+    #这边计算的少一点,因为到时候计算每个棋子控制的格点还要再次计算
+    'OG':{
+        'narrow':-300,
+        'middle':-100,
+        'wide':-50
+    },
+    'MG':{
+        'narrow':-200,
+        'middle':-100,
+        'wide':0
+    },
+    'EG':{
+        'narrow':-200,
+        'middle':-20,
+        'wide':0,
+    }
+},
+#车能控制的格点数
+BAD_CAR_THRESHOLD={
+        'narrow':3,
+        'wide':7,
+}
+
+#棋子控制的格点得分奖励 可以忽略掉兵
+PIECE_CONTROL_BONUS_SET={
+    'OG':{
+        'horse':{'narrow':20,'middle':50,'wide':100},
+        'elephant':{'narrow':20,'middle':70,'wide':150},
+        'car':{'narrow':0,'middle':50,'wide':100},
+        'queen':{'narrow':0,'middle':20,'wide':30},
+    },
+    'MG':{
+        'horse':{'narrow':30,'middle':60,'wide':120},
+        'elephant':{'narrow':30,'middle':70,'wide':180},
+        'car':{'narrow':0,'middle':80,'wide':150},
+        'queen':{'narrow':0,'middle':40,'wide':60},
+    },
+    'EG':{
+        'horse':{'narrow':10,'middle':80,'wide':150},
+        'elephant':{'narrow':40,'middle':80,'wide':200},
+        'car':{'narrow':0,'middle':70,'wide':160},
+        'queen':{'narrow':0,'middle':80,'wide':200},
+    },
+},
+#各种棋子控制格点的多少
+PIECE_CONTROL_BONUS_THRESHOLD={
+    'horse':{'narrow':2,'wide':5},
+    'elephant':{'narrow':4,'wide':10},
+    'queen':{'narrow':6,'wide':15},
+    'car':{'narrow':4,'wide':10}
+}
+
+#将要升变的通路兵,距离底线距离不同得分不同
+SOLDIER_WILL_PROMOTION_SET={
+    'OG':{6:100,5:120,4:130,3:150,2:200,1:300},
+    'MG':{6:120,5:150,4:200,3:250,2:300,1:400},
+    'EG':{6:200,5:300,4:400,3:500,2:600,1:800},#残局的兵价值最大
+},
+#如果这个兵不受保护,那就乘以这个值
+SOLDIER_WILL_PROMOTION_WEAK_LOSS=0.2
+
+#对局结果
+WHITE_WIN='1-0'
+BLACK_WIN='0-1'
+DRAW='1/2-1/2'
+NOT_STOP='*'
+
+# 先锋的估值 只包括轻子和兵
+OUT_POST_SET={
+    'OG':{
+        's':{5:-20,4:-25,3:-30,2:-35},
+        'S':{5:20,4:25,3:30,2:35},
+        'h':{5:-50,4:-70,3:-100,2:-180},
+        'H':{5:50,4:70,3:100,2:180},
+        'e':{5:-30,4:-40,3:-30,2:-30},
+        'E':{5:30,4:40,3:30,2:30}
+    },
+    'MG':{
+        's':{5:-40,4:-50,3:-60,2:-100},
+        'S':{5:40,4:50,3:60,2:100},
+        'h':{5:-60,4:-80,3:-100,2:-180},
+        'H':{5:60,4:80,3:100,2:180},
+        'e':{5:-30,4:-40,3:-30,2:-30},
+        'E':{5:30,4:40,3:30,2:30}
+    },
+    'EG':{
+        's':{5:-20,4:-25,3:-30,2:-35},
+        'S':{5:20,4:25,3:30,2:35},
+        'h':{5:-50,4:-55,3:-80,2:-100},
+        'H':{5:50,4:55,3:80,2:100},
+        'e':{5:-30,4:-40,3:-30,2:-30},
+        'E':{5:30,4:40,3:30,2:30}
+    }
+}
+
+GLOBAL_DICT={}
