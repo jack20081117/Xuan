@@ -112,8 +112,45 @@ class Chess(object):
             return END_GAME
         return MIDDLE_GAME#默认其他都是中局
 
+    @staticmethod
+    def parseBoard(board:chess.Board or chess.SquareSet)->list:
+        lines=str(board).split('\n')
+        lineList=[]
+        for i in range(len(lines)):
+            singleLine=lines[i].split(' ')
+            lineList.append(singleLine)
+        return lineList
+
     #判断这个棋子是不是白棋
     @staticmethod
     def isWhite(piece:str)->bool:
         return True if piece.isupper() else False
 
+    def getSingleAttack(self,board:chess.Board,i,j):
+        res=board.attacks(square=BOARD_PLACE[i][j])
+        res=self.parseBoard(res)
+        return res
+
+    @staticmethod
+    def isLight(piece:str)->bool:
+        return True if piece=='h' or piece=='H' or piece=='e' or piece=='E' else False
+
+    @staticmethod
+    def isHeavy(piece:str)->bool:
+        return True if piece=='c' or piece=='C' or piece=='q' or piece=='Q' else False
+
+    @staticmethod
+    def isSoldier(piece:str)->bool:
+        return True if piece=='s' or piece=='S' else False
+
+    @staticmethod
+    def isKing(piece:str)->bool:
+        return True if piece=='k' or piece=='K' else False
+
+    @staticmethod
+    def isOutPost(index:int)->bool:#先锋区域,3~6行
+        return True if 2<=index<=5 else False
+
+    @staticmethod
+    def isMiddle(index:int)->bool:#中心区域,3~6列
+        return True if 3<=index<=6 else False
