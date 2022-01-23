@@ -389,12 +389,15 @@ export default {
                     }
         },
         drawSingleStep(i,j,num){
+            let offsetText=0;
             num=num||this.goban.length;
+            if(num<10) offsetText=5;
+            if(num>100) offsetText=-5;
             if(this.board[i][j]!==0){
                 let textColor=(this.board[i][j]===1?this.white:this.black);
                 this.context.fillStyle=textColor;
                 this.context.font="20px Arial";
-                this.context.fillText(num.toString(),i*40-10+this.offsetX,j*40+10+this.offsetY);
+                this.context.fillText(num.toString(),i*40-10+this.offsetX+offsetText,j*40+10+this.offsetY);
             }
         },
         drawStep(){
