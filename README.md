@@ -12,8 +12,17 @@ Xuan是一款开源的围棋AI，其名称来源于中国古代围棋名著 **�
 可能需要的软件:Pycharm,VS Code,SourceTree
 
 # 安装与运行
-在根目录下有运行文件runfront.bat,runback.bat
-分别为前端与引擎的运行文件.
+## 前端(/front)
+```
+npm install
+npm run dev
+```
+## 引擎(/engine)
+
+```
+python main.py
+```
+
 
 # 围棋|Go
 ## 围棋规则浅谈|go rules
