@@ -13,7 +13,7 @@ def getEmptyBoard():
         [0,0,0,0,0,0,0,0]
     ]
 
-def getEmptyString():#这里就不按国际象棋的标准英文设置了,相信大家都看得懂
+def getEmptyPieceTypeDict():#这里就不按国际象棋的标准英文设置了,相信大家都看得懂
     return {
         'soldier':[],
         'elephant':[],
