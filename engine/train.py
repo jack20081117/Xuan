@@ -19,7 +19,7 @@ osType=platform.system()
 logFileName='./savedModel/trainData.txt'
 
 config=CONFIG
-gl['model_path']=config['model']
+gl['modelPath']=config['model']
 gl['ai']=config['ai']
 DEVICE=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 logging.info("DEVICE=%s"%DEVICE)
@@ -34,11 +34,12 @@ valuePath=config['model']['value']
 def getDataSet():
     dbpath=os.path.dirname(os.path.realpath(__file__))
     gl['logpath']=dbpath
-
     old=os.path.join(dbpath,config['db'].get('old',None))
     current=os.path.join(dbpath,config['db'].get('current',None))
     ai=os.path.join(dbpath,config['db'].get('ai',None))
     Jack=os.path.join(dbpath,config['db'].get('Jack',None))
+    dbpath=os.path.join(dbpath,config['db']['filepath'])
+    gl['dbpath']=dbpath
 
     model={
         'old':old,

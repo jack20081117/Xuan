@@ -22,12 +22,12 @@ if __name__ == '__main__':
 
     dbpath=os.path.dirname(os.path.realpath(__file__))
     gl['logpath']=dbpath
-    dbpath=os.path.join(dbpath,config['db']['filepath'])
-    gl['dbpath']=dbpath
     old=os.path.join(dbpath,config['db'].get('old',None))
     current=os.path.join(dbpath,config['db'].get('current',None))
     ai=os.path.join(dbpath,config['db'].get('ai',None))
     Jack=os.path.join(dbpath,config['db'].get('Jack',None))
+    dbpath=os.path.join(dbpath,config['db']['filepath'])
+    gl['dbpath']=dbpath
 
     model={
         'old':old,
