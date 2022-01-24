@@ -26,7 +26,7 @@ if __name__ == '__main__':
     current=os.path.join(dbpath,config['db'].get('current',None))
     ai=os.path.join(dbpath,config['db'].get('ai',None))
     Jack=os.path.join(dbpath,config['db'].get('Jack',None))
-    dbpath=os.path.join(dbpath,config['db']['filepath'])
+    dbpath=os.path.join(dbpath,config['db'].get('current',None))
     gl['dbpath']=dbpath
 
     model={

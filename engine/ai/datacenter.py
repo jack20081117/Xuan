@@ -58,7 +58,7 @@ class DataCenter(object):
     def getModelByName(self,name):
         path=self.model.get(name,None)
         if path is None:
-            logging.error('未配置%d数据库地址'%name)
+            logging.error('未配置%s数据库地址'%name)
             return []
         self.database.init(path)
         result=self.database.select(selectGoData)
