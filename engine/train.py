@@ -194,7 +194,7 @@ def train(dataSet,time,testDataSet):
     ADAM=int(config['ai'].get('ADAM',None))
     L2_REG=float(config['ai'].get('L2_REG',None))
     MOMENTUM=float(config['ai'].get('MOMENTUM',None))
-    EPOCH=float(config['ai'].get('EPOCH',None))
+    EPOCH=int(config['ai'].get('EPOCH',None))
 
     if osType!='Windows' and EPOCH>4:
         EPOCH=4

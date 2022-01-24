@@ -9,7 +9,7 @@ port=config['tcp']['port']
 
 dbpath=os.path.dirname(os.path.realpath(__file__))
 gl['logpath']=dbpath
-dbpath=os.path.join(dbpath,config['db']['filepath'])
+dbpath=os.path.join(dbpath,config['db'].get('current',None))
 gl['dbpath']=dbpath
 gl['config']=config
 
