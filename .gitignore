@@ -1,8 +1,8 @@
 .idea
 .vscode
-engine/savedModel
-engine/dataSet
-engine/mnist
+engine/savedModel/*
+engine/dataSet/*
+engine/mnist/*
 front/node_modules
 front/dist/electron/*
 front/dist/web/*
