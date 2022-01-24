@@ -154,3 +154,115 @@ class Chess(object):
     @staticmethod
     def isMiddle(index:int)->bool:#中心区域,3~6列
         return True if 3<=index<=6 else False
+
+    @staticmethod
+    def parseUci2Step(uci,parsedBoard:list,board)->str:
+        logging.warning('不建议使用parseUci2Step函数')
+        uciStr=str(uci)
+        logging.info('parsedBoard :>> %s'%parsedBoard)
+        beginX=ALPHABET[uciStr[0:1]]
+        beginY=ALPHABET[uciStr[1:2]]
+        endX=uciStr[2:3]
+        endY=uciStr[3:4]
+        promote=uciStr[4:5] or None
+        promoteText=('='+promote.upper() if promote is not None else '')
+        x,y=beginX-1,8-beginY
+        destX,destY=ALPHABET[endX]-1,8-ALPHABET[endY]
+        kill=('x' if parsedBoard[destY][destX]!='.' else '')
+        pieces:str=parsedBoard[y][x]
+        name=('' if(pieces=='.' or pieces.upper()=='P') else pieces.upper())
+        board.push(uci)
+        #增加对将军和将杀的校验
+        isCheck:bool=board.is_check()
+        isCheckmate:bool=board.is_checkmate()
+        res=str(name)+kill+str(endX)+str(endY)+str(promoteText)
+        if isCheckmate:
+            res+='#'
+            return res
+        if isCheck:
+            res+='+'
+            return res
+
+    #传入一个棋盘的list,解析其中的内容,方便估值函数使用.尽量做到时间复杂度O(n²)
+    def parseInternalBoardInfo(self,rootBoard:chess.Board,fen)->dict:
+        #自动转换,方便点
+        board=self.parseBoard(rootBoard) if not isinstance(rootBoard,list) else rootBoard
+        res={
+            'whiteAttack':getEmptyBoard(),
+            'blackAttack':getEmptyBoard(),
+            'white':getEmptyPieceTypeDict(),
+            'black':getEmptyPieceTypeDict(),
+            'whiteOutpost':[],
+            'blackOutpost':[],
+            'whitePieces':getEmptyPieceTypeDict(),
+            'blackPieces':getEmptyPieceTypeDict(),
+            'allSoldierPiled':None,
+            'whiteSoldierPiled':None,
+            'blackSoldierPiled':None,
+            'whiteBadCar':[],
+            'blackBadCar':[],
+            'whiteThreaten':[],
+            'blackThreaten':[],
+            'whitePromotionSoldier':[],
+            'blackPromotionSoldier':[],
+            'currentColor':self.getCurrentColorByFen(fen=fen)
+        }
+        allRes,whiteRes,blackRes=self.getSoldierPiled(board=board)
+        res['allSoldierPiled']=allRes
+        res['whiteSoldierPiled']=whiteRes
+        res['blackSoldierPiled']=blackRes
+        for i in range(BOARD_SIZE):
+            for j in range(BOARD_SIZE):
+                piece=board[i][j]
+                if piece!=PIECES['EMPTY']:
+                    pass
+        return res
+
+    @staticmethod
+    def getPiecesInfo(info:dict,color)->tuple:
+        text='white' if color==WHITE else 'black'
+        subInfo=info[text]
+        elephant=subInfo['elephant']
+        car=subInfo['car']
+        queen=subInfo['queen']
+        horse=subInfo['horse']
+        soldier=subInfo['soldier']
+        king=subInfo['king']
+        return elephant,car,queen,horse,soldier,king
+
+    #判断这个棋子是否受到威胁,不能只看攻击列表,还得看子力强弱,先不判断棋子被钉死的情况
+    def checkThreaten(self,info:dict,x,y,color,pieceType)->bool:
+        if color==WHITE:
+            oppoColor=BLACK
+            attackListText='whiteAttack'
+            oppoAttackListText='blackAttack'
+        else:
+            oppoColor=WHITE
+            attackListText='blackAttack'
+            oppoAttackListText='whiteAttack'
+        #获取对方的棋子情况
+        elephant,car,queen,horse,soldier,king=self.getPiecesInfo(info=info,color=oppoColor)
+        attackList=info[attackListText]
+        oppoAttackList=info[oppoAttackListText]
+        #被对方攻击然而自己没人保护,直接返回True,节约性能
+        if oppoAttackList[x][y] and not attackList[x][y]:return True
+        #被兵攻击就是威胁,因为兵吃任何棋子都不亏
+        for i in range(len(soldier)):
+            attack=soldier[i]
+            if attack['attack'][x][y]!=PIECES['EMPTY']:return True
+        #重子被轻子威胁,直接就是威胁了
+        if pieceType==PIECES['WHITE_CAR'] or pieceType==PIECES['WHITE_QUEEN']:
+            for i in range(len(elephant)):
+                attack=elephant[i]
+                if attack['attack'][x][y]!=PIECES['EMPTY']:return True
+            for i in range(len(horse)):
+                attack=horse[i]
+                if attack['attack'][x][y]!=PIECES['EMPTY']:return True
+            #后被车威胁
+            if pieceType==PIECES['WHITE_QUEEN']:
+                for i in range(len(car)):
+                    attack=car[i]
+                    if attack['attack'][x][y]!=PIECES['EMPTY']:return True
+        return False
+
+    
