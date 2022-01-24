@@ -474,15 +474,21 @@ export default {
                 this.goban.push({x,y,color:(color==='black'?1:-1)});
                 console.log(`目前是第${i}手,x:${x},y:${y},color:${color}`);
                 this.sgfLogic(x,y,color);
-                this.history.push({
-                    board:this.board,string:this.string,
-                    robX:this.robX,robY:this.robY,
-                    siteX:this.siteX,siteY:this.siteY
-                });
+                let historyPush={
+                    string:_.cloneDeep(this.string),
+                    board:_.cloneDeep(this.board),
+                    robX:this.robX,
+                    robY:this.robY,
+                    siteX:this.siteX,
+                    siteY:this.siteY
+                }
+                this.history.push(historyPush);
+                this.currentNum++;
             }
             console.log("string :>> ",this.string);
             console.log("board :>> ",this.board);
             console.log("goban :>> ",this.goban);
+            console.log("currentNum :>> ",this.currentNum);
             this.refresh();
         },
         doBoardControl(type){
@@ -551,6 +557,7 @@ export default {
                 this.siteX=null;
                 this.siteY=null;
             }else{
+                console.log("history :>> ",this.history);
                 this.string=this.history[this.currentNum].string;
                 this.board=this.history[this.currentNum].board;
                 this.robX=this.history[this.currentNum].robX;
