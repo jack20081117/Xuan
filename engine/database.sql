@@ -18,7 +18,8 @@ CREATE TABLE "goData"
     sgf VARCHAR(1000) NOT NULL,
     black VARCHAR(20),
     white VARCHAR(20),
-    createTime VARCHAR(20)
+    createTime VARCHAR(20),
+    hash VARCHAR(20)
 );
 
 CREATE TABLE "fileRead"

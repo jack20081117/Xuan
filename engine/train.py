@@ -229,7 +229,7 @@ def train(dataSet,time,testDataSet):
                 featureMaps=feature(batchState.clone().detach())
                 winner=policy(featureMaps)
                 probas=value(featureMaps)
-                loss=criterion(winner,batchWinner,probas,batchProbas)
+                loss=criterion.forward(winner,batchWinner,probas,batchProbas)
                 loss.backward()
                 optimizer.step()
                 singleLoss.append(float(loss))

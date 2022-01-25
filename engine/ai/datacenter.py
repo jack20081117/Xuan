@@ -24,7 +24,8 @@ class DataCenter(object):
         createtime=getDatetime()['timestr']
         black=additional['PB']
         white=additional['PW']
-        sql=insertGoData.format(sgf,black,white,createtime)
+        hash=getHash(sgf)
+        sql=insertGoData.format(sgf,black,white,createtime,hash)
         self.database.execute(sql)
         return {
             'code':0,
