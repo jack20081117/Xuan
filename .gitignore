@@ -7,6 +7,8 @@ front/node_modules
 front/dist/electron/*
 front/dist/web/*
 front/static
+front/build/*
+!front/build/icons
 
 !.gitkeep
 
