@@ -35,6 +35,7 @@ import influence from "@sabaki/influence";
 import * as util from "./util.js";
 import Go from "./go.js";
 import * as constant from './constant.js';
+import { systemPreferences } from 'electron';
 
 let sound=document.body.appendChild(document.createElement("span"));
 sound.play=function(){
@@ -147,7 +148,7 @@ export default {
                 this.$Message.info(result.message);
             }
         });
-        //局面分析
+        //判断形式
         Bus.$on("boardAnalyze",()=>{
             this.getInfluence();
         });
