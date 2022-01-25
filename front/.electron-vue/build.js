@@ -82,14 +82,8 @@ async function build(){
 
     del.sync(['dist/electron/*','!.gitkeep']);
 
-    const tasks=['main','renderer'];
-    const multispinner=new Multispinner(tasks,{
-        preText:'building',
-        postText:'process'
-    });
-
     let results='';
-    const newTasks=new Listr(
+    const tasks=new Listr(
         [
             {
                 title:'building master process',
@@ -116,7 +110,7 @@ async function build(){
         ],
         {concurrent:2}
     );
-    await newTasks.run().then(()=>{
+    await tasks.run().then(()=>{
         process.stdout.write('\x1B[2J\x1B[0f');
         console.log(`\n\n${results}`);
         console.log(`${okayLog}take it away ${chalk.yellow('`electron-builder`')}\n`);
