@@ -74,7 +74,7 @@ SOLDIER_PILED_SET={
     'MG':{
         'attacked':-70,
         'normal':-35,
-        'attackAndPprotected':-35,
+        'attackAndProtected':-35,
         'protected':-15
     },
     'EG':{

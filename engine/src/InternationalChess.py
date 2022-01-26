@@ -341,3 +341,32 @@ class Chess(object):
         if piece=='H':return 'horse'
         if piece=='C':return 'car'
         if piece=='K':return 'king'
+
+    #将获取到的棋子放入数组
+    def setPieces(self,info:dict,piece:str,x:int,y:int)->dict:
+        colorText='whitePieces' if self.isWhite(piece=piece) else 'blackPieces'
+        pieceText=self.getPieceTypeByText(piece=piece)
+        info[colorText][pieceText].append({'x':x,'y':y})
+        return info
+
+    #将获取到的进攻状态进行处理
+    def setAttacks(self,info:dict,attack:list,piece:str,x:int,y:int):
+        if self.isWhite(piece=piece):
+            attackType='whiteAttack'
+            color='white'
+        else:
+            attackType='blackAttack'
+            color='black'
+        pieceText=self.getPieceTypeByText(piece=piece)
+        for i in range(BOARD_SIZE):
+            for j in range(BOARD_SIZE):
+                if attack[i][j]!=PIECES['EMPTY']:
+                    info[attackType][i][j]+=1
+        info[color][pieceText].append({'x':x,'y':y,'attack':attack})
+        return info
+
+    #给先锋棋子赋值
+    def setOutposts(self,info:dict,piece:str,x:int,y:int,attack:list):
+        outpostType='whiteOutpost' if self.isWhite(piece) else 'blackOutpost'
+        info[outpostType].append({'x':x,'y':y,'piece':piece})
+        return info
