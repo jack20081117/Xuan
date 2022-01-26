@@ -13,7 +13,7 @@ class Node(object):
         self.probas=probas
         self.parent=parent#父节点
         self.son=[]#子树集合
-        self.num=0#便利的次数
+        self.num=0#遍历的次数
 
     def isLeaf(self):
         return len(self.son)==0
