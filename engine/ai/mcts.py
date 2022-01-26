@@ -15,11 +15,19 @@ class Node(object):
         self.son=[]#子树集合
         self.num=0#遍历的次数
 
+    def __str__(self):
+        return 'Node object,son:%s'%self.son
+
+    __repr__=__str__
+
     def isLeaf(self):
         return len(self.son)==0
 
     def getSon(self):
         return self.son
+
+    def getParent(self):
+        return self.parent
 
     def expand(self,string,board,legalMoves,probas):
         self.son.append(Node(string=string,board=board,legalMoves=legalMoves,probas=probas,parent=self))
@@ -32,8 +40,7 @@ class MCTS(object):
         self.engine=Xuan()
 
     def analyze(self,goban):
-        rootLegalMoves,rootProbas,rootWinner=self.engine.doAnalyze(goban=goban)
-        rootString,rootBoard=self.engine.string,self.engine.board
+        rootLegalMoves,rootProbas,rootWinner,rootString,rootBoard=self.engine.doAnalyze(goban=goban)
         self.root=Node(string=rootString,board=rootBoard,legalMoves=rootLegalMoves,probas=rootProbas)
         color=1 if len(goban)==0 else Go.reverseColor(goban[-1]['color'])
         logging.info('上一步的合法落子点为 rootLegalMoves=%s'%rootLegalMoves)
@@ -49,8 +56,7 @@ class MCTS(object):
             })
             colorText=Go.getColorTextByNum(color)
             success,board,string,robX,robY=self.engine.go.GoLogic(x,y,colorText)
-            legalMoves,probas,winner=self.engine.doAnalyze(backupGoban)
-            analyzeString,analyzeBoard=self.engine.string,self.engine.board
+            legalMoves,probas,winner,analyzeString,analyzeBoard=self.engine.doAnalyze(backupGoban)
             logging.info('扩展的合法落子点 legalMoves:%s'%legalMoves)
             self.root.expand(string=string,board=board,legalMoves=legalMoves,probas=probas)
 

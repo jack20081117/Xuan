@@ -58,7 +58,7 @@ class Xuan(object):#围棋AI的核心模块
         if dataDict['operator']=='run':#引擎分析
             self.parseStepData(dataDict)
             goban=dataDict['goban']
-            legalMoves,probas,winner=self.doAnalyze(goban)
+            legalMoves,probas,winner,string,board=self.doAnalyze(goban)
             return {
                 'code':0,
                 'message':'success',
@@ -131,7 +131,7 @@ class Xuan(object):#围棋AI的核心模块
         probas,winner=self.analyze(state)
         resultList=self.transferAnalyze2List(probas,winner)
         legalMoves=self.getLegalMoves(resultList)
-        return legalMoves,probas,winner
+        return legalMoves,probas,winner,self.string,self.board
 
     def getLegalMoves(self,allMoves,threshold=5):#获取合法的落子点,默认取5个
         threshold=int(self.aiConfig['THRESHOLD'])
