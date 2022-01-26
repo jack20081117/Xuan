@@ -231,7 +231,7 @@ class Chess(object):
         return elephant,car,queen,horse,soldier,king
 
     #判断这个棋子是否受到威胁,不能只看攻击列表,还得看子力强弱,先不判断棋子被钉死的情况
-    def checkThreaten(self,info:dict,x,y,color,pieceType)->bool:
+    def checkIfThreaten(self,info:dict,x,y,color,pieceType)->bool:
         if color==WHITE:
             oppoColor=BLACK
             attackListText='whiteAttack'
@@ -265,4 +265,79 @@ class Chess(object):
                     if attack['attack'][x][y]!=PIECES['EMPTY']:return True
         return False
 
-    
+    def checkSingleColorThreaten(self,info:dict,color)->dict:#判断每个颜色的棋子是否受到威胁
+        if color==WHITE:
+            text='white'
+            threatText='whiteThreaten'
+            attackText='blackAttack'
+        else:
+            text='black'
+            threatText='blackThreaten'
+            attackText='whiteAttack'
+        attacked=info[attackText]
+        elephant,car,queen,horse,soldier,king=self.getPiecesInfo(info=info,color=color)
+        for i in range(len(elephant)):
+            x,y=elephant[i]['x'],elephant[i]['y']
+            check=self.checkIfThreaten(info=info,x=x,y=y,color=color,pieceType=PIECES['WHITE_ELEPHANT'])
+            if check:info[threatText].append({'x':x,'y':y})
+        for i in range(len(car)):
+            x,y=car[i]['x'],car[i]['y']
+            check=self.checkIfThreaten(info=info,x=x,y=y,color=color,pieceType=PIECES['WHITE_CAR'])
+            if check:info[threatText].append({'x':x,'y':y})
+        for i in range(len(queen)):
+            x,y=queen[i]['x'],queen[i]['y']
+            check=self.checkIfThreaten(info=info,x=x,y=y,color=color,pieceType=PIECES['WHITE_QUEEN'])
+            if check:info[threatText].append({'x':x,'y':y})
+        for i in range(len(horse)):
+            x,y=horse[i]['x'],horse[i]['y']
+            check=self.checkIfThreaten(info=info,x=x,y=y,color=color,pieceType=PIECES['WHITE_HORSE'])
+            if check:info[threatText].append({'x':x,'y':y})
+        return info
+
+    def checkAllThreaten(self,info:dict)->dict:
+        info=self.checkSingleColorThreaten(info,WHITE)
+        info=self.checkSingleColorThreaten(info,BLACK)
+        return info
+
+    #自身左右的格子不能有兵拦着,对白棋来说对手的兵如果y坐标比自己的大可以忽略,黑棋反之,因为已经超过自己了,不会阻挡升变.
+    @staticmethod
+    def checkSingleSoldierIsPromotion(oppoSoldier:list,x,y,color)->bool:
+        y1,y2=y-1,y-2
+        for i in range(len(oppoSoldier)):
+            soldier=oppoSoldier[i]
+            oppoX=soldier['x']
+            oppoY=soldier['y']
+            #判断条件是白棋的路线上有黑棋或黑棋的路线有白棋
+            if color==WHITE and x>oppoX:
+                if y==oppoY or y1==oppoY or y2==oppoY:
+                    return False#不是通路兵
+            if color==BLACK and x<oppoX:
+                if y==oppoY or y1==oppoY or y2==oppoY:
+                    return False#不是通路兵
+        return True
+
+    def getAllPromotion(self,info:dict)->dict:
+        whiteSoldiers=info['whitePieces']['soldier']
+        blackSoldiers=info['blackPieces']['soldier']
+        for i in range(len(whiteSoldiers)):
+            soldier=whiteSoldiers[i]
+            x,y=soldier['x'],soldier['y']
+            res=self.checkSingleSoldierIsPromotion(blackSoldiers,x,y,WHITE)
+            if res:info['whitePromotionSoldier'].append({'x':x,'y':y})
+        for i in range(len(blackSoldiers)):
+            soldier=blackSoldiers[i]
+            x,y=soldier['x'],soldier['y']
+            res=self.checkSingleSoldierIsPromotion(whiteSoldiers,x,y,BLACK)
+            if res:info['blackPromotionSoldier'].append({'x':x,'y':y})
+        return info
+
+    @staticmethod
+    def getPieceTypeByText(piece:str)->str:
+        #输入缩写返回全称
+        piece=piece.upper()
+        if piece=='S':return 'soldier'
+        if piece=='Q':return 'queen'
+        if piece=='E':return 'elephant'
+        if piece=='H':return 'horse'
+        if piece=='C':return 'car'
+        if piece=='K':return 'king'

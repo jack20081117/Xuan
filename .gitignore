@@ -1,3 +1,9 @@
 .idea
+engine/dataSet/*
+engine/savedModel/*
+front/node_modules
+front/package-lock.json
+front/dist/electron/*
+front/dist/web/*
 
 *.py[cod]
