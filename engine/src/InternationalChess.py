@@ -370,3 +370,120 @@ class Chess(object):
         outpostType='whiteOutpost' if self.isWhite(piece) else 'blackOutpost'
         info[outpostType].append({'x':x,'y':y,'piece':piece})
         return info
+
+    @staticmethod
+    def checkIfKingBetweenRook(info:dict,color)->dict:
+        pieces,carType=('whitePieces','whiteBadCar') if color is WHITE else ('blackPieces','blackBadCar')
+        king=info['pieces']['king'][0]
+        cars=info['pieces']['car']
+        if len(cars)==1:
+            info[carType].append(cars[0])
+            return info
+        if len(cars)==0:
+            return info
+        if len(cars)>2:
+            return info#有超过两个的车 基本就是大优局面了
+        car1,car2=cars[0],cars[1]
+        if(car1['y']<king['y']<car2['y']) or (car2['y']<king['y']<car1['y']):
+            info[carType].append(car1)
+            info[carType].append(car2)
+        return info
+
+    #检查是否存在无法王车易位 挡住车路线
+    def checkBadCar(self,info:dict,rootBoard:chess.Board)->dict:
+        if rootBoard.has_kingside_castling_rights(WHITE) is False\
+        and rootBoard.has_queenside_castling_rights(WHITE) is False:
+            info=self.checkIfKingBetweenRook(info=info,color=WHITE)
+        if rootBoard.has_kingside_castling_rights(BLACK) is False \
+        and rootBoard.has_queenside_castling_rights(BLACK) is False:
+            info=self.checkIfKingBetweenRook(info=info,color=BLACK)
+        return info
+
+    @staticmethod
+    def checkIfInThreaten(x,y,threaten:list)->bool:
+        for i in range(len(threaten)):
+            if x==threaten[i]['x'] and y==threaten[i]['y']:
+                return True
+        return False
+
+    @staticmethod
+    def getDistance(x,y,color)->int:#获取棋子到底线的距离
+        return x if color==WHITE else 7-x
+
+    @staticmethod
+    def calculateScore(scoreList:list)->float:
+        res:float=0
+        for i in range(BOARD_SIZE):
+            for j in range(BOARD_SIZE):
+                res+=scoreList[i][j]
+        return res/100
+
+    def calculateOutpost(self,info:dict,scoreList:list,gameCourse:str)->list:
+        whiteOutpost=info['whiteOutpost']
+        blackOutpost=info['blackOutpost']
+        whiteThreaten=info['whiteThreaten']
+        blackThreaten=info['blackThreaten']
+        for i in range(len(whiteOutpost)):#是先锋且不受威胁则可以加分
+            singleOutpost=whiteOutpost[i]
+            x,y=singleOutpost['x'],singleOutpost['y']
+            piece=singleOutpost['piece']
+            checkThreaten=self.checkIfInThreaten(x=x,y=y,threaten=whiteThreaten)
+            distance=self.getDistance(x=x,y=y,color=WHITE)
+            if not checkThreaten:scoreList[x][y]+=OUT_POST_SET[gameCourse][piece][distance]
+        for i in range(len(blackOutpost)):
+            singleOutpost=blackOutpost[i]
+            x,y=singleOutpost['x'],singleOutpost['y']
+            piece=singleOutpost['piece']
+            checkThreaten=self.checkIfInThreaten(x=x,y=y,threaten=blackThreaten)
+            distance=self.getDistance(x=x,y=y,color=BLACK)
+            if not checkThreaten:scoreList[x][y]+=OUT_POST_SET[gameCourse][piece][distance]
+        logging.info('计算先锋后,score :>> %f'%self.calculateScore(scoreList=scoreList))
+        return scoreList
+
+    @staticmethod
+    def calculateSinglePiledSoldier(scoreList:list,piled:list,whiteAttack,blackAttack,color,gameCourse:str)->list:
+        for i in range(len(piled)):
+            singlePiled=piled[i]
+            x,y=singlePiled['x'],singlePiled['y']
+            if whiteAttack[x][y]==0 and blackAttack[x][y]==0:#大家都没攻击就是normal
+                flag='normal'
+            elif whiteAttack[x][y]!=0 and blackAttack[x][y]!=0 and whiteAttack[x][y]==blackAttack[x][y]:#攻击和保护的次数相同且不为0
+                flag='attackAndProtected'
+            elif whiteAttack[x][y]>blackAttack[x][y]:#对白棋来说这是保护,对黑棋来说这是攻击
+                flag='protected' if color==WHITE else 'attacked'
+            elif blackAttack[x][y]>whiteAttack[x][y]:#对黑棋来说这是保护,对白棋来说这是攻击
+                flag='protected' if color==BLACK else 'attacked'
+            else:raise RuntimeError('Something strange happened.')
+            scoreList[x][y]+=SOLDIER_PILED_SET[gameCourse][flag]
+        return scoreList
+
+    def calculatePiledSoldier(self,info:dict,scoreList:list,gameCourse:str)->list:
+        whitePiled=info['whiteSoldierPiled']
+        blackPiled=info['blackSoldierPiled']
+        whiteAttack=info['whiteAttack']
+        blackAttack=info['blackAttack']
+        scoreList=self.calculateSinglePiledSoldier(scoreList=scoreList,piled=whitePiled,whiteAttack=whiteAttack,blackAttack=blackAttack,
+                                                   color=WHITE,gameCourse=gameCourse)
+        scoreList=self.calculateSinglePiledSoldier(scoreList=scoreList,piled=blackPiled,whiteAttack=whiteAttack,blackAttack=blackAttack,
+                                                   color=BLACK,gameCourse=gameCourse)
+        logging.info('计算叠兵后,score :>> %f'%self.calculateScore(scoreList=scoreList))
+        return scoreList
+
+    def doEvaluate(self,info:dict,rootBoard:chess.Board)->float:
+        result=rootBoard.result()
+        if result!=NOT_STOP:
+            if result==WHITE_WIN:return 100
+            if result==BLACK_WIN:return -100
+            if result==DRAW:return 0
+            raise RuntimeError('found other result :>> %s'%result)
+        board=self.parseBoard(rootBoard)
+        gameCourse=self.getCurrentGameCourse(board)
+        scoreList:list=getEmptyBoard()
+        for i in range(BOARD_SIZE):
+            for j in range(BOARD_SIZE):
+                piece=board[i][j]
+                scoreList[i][j]=SCORE_DICT[gameCourse][piece]
+        scoreList=self.calculatePiledSoldier(info=info,scoreList=scoreList,gameCourse=gameCourse)
+
+        score=self.calculateScore(scoreList=scoreList)
+        return score
