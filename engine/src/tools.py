@@ -57,3 +57,6 @@ def getDatetime():
         'timeformat':timeformat,
         'datestr':datestr
     }
+
+def loopFor2D(List:list):
+    return [item for subList in List for item in subList]

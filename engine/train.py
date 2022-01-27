@@ -27,11 +27,11 @@ batchSize=int(config['ai']['BATCHSIZE'])
 checkPoint=0
 go=Go()
 
-featurePath=config['model']['feature']
-policyPath=config['model']['policy']
-valuePath=config['model']['value']
+featurePath=config['model'].get('feature',None)
+policyPath=config['model'].get('policy',None)
+valuePath=config['model'].get('value',None)
 
-def getDataSet():
+def getDataSet()->list:
     dbpath=os.path.dirname(os.path.realpath(__file__))
     gl['logpath']=dbpath
     old=os.path.join(dbpath,config['db'].get('old',None))
@@ -64,9 +64,11 @@ def collateFn(data):
         goban,winner,parsedSgf,stringList=go.parseSingleData(singleData)
 
         for j in range(len(goban)-1):
+            #随机取棋盘的一块值
             rand=j
             winnerList.append(winner)
             currentDict=parsedSgf[rand]
+            #计算出下一手的位置
             nextDict=parsedSgf[rand+1]
             nextX,nextY=nextDict['x'],nextDict['y']
             nextBoard=getEmptyBoard()
@@ -83,17 +85,19 @@ def collateFn(data):
                 colorSetNum=1
                 myColor=1
                 oppoColor=-1
-            myLast,oppoLast=go.getLastBoard(goban,j,1,1)
+            #获取己方和对手方的最近的7步棋
+            myLast7Boards,oppoLast7Boards=go.getLastBoard(goban,j,1,1)
+            #将原生的棋盘数据抽成己方的棋盘和对手方的棋盘,其他位置全0处理
             myBoard,oppoBoard=go.getMyOppoBoard(currentBoard,myColor,oppoColor)
             colorBoard=go.getCurrentColorBoard(colorSetNum)
             my=[myBoard]
-            my.extend(myLast)
+            my.extend(myLast7Boards)
             oppo=[oppoBoard]
-            oppo.extend(oppoLast)
+            oppo.extend(oppoLast7Boards)
             my.extend(oppo)
             my.append(colorBoard)
             state.append(my)
-            probasList.append(nextBoard)
+            probasList.append(loopFor2D(nextBoard))
 
     return state,winnerList,probasList
 
@@ -128,7 +132,7 @@ def saveModel(feature,policy,value,saveFirst=False):
         torch.save(policy,os.path.join('savedModel',time,'policy.bin'))
         logging.info('保存value网络...')
         torch.save(value,os.path.join('savedModel',time,'value.bin'))
-
+        #一定要保存一个最新的
         logging.info('保存最新的feature网络...')
         torch.save(feature,featurePath)
         logging.info('保存最新的policy网络...')
@@ -138,6 +142,7 @@ def saveModel(feature,policy,value,saveFirst=False):
 
     except Exception as e:
         logging.error("保存神经网络失败 原因 :>> %s"%e)
+        #保存到目录失败 那就只存最新的
         logging.info('保存feature网络...')
         torch.save(feature,featurePath)
         logging.info('保存policy网络...')
@@ -145,9 +150,9 @@ def saveModel(feature,policy,value,saveFirst=False):
         logging.info('保存value网络...')
         torch.save(value,valuePath)
 
-def test(dataSet):
+def test(dataSet):#测试模块
     engine=Xuan()
-    accuracy=[]
+    accuracy=[]#精度
     for i in range(len(dataSet)):
         sgf=dataSet[i]['sgf']
         goban,winner,parsedSgf,stringList=go.parseSgf2NetworkData(sgf)
@@ -184,9 +189,10 @@ def test(dataSet):
         f.write('\n')
     logging.info('保存数据成功')
 
-def train(dataSet,time,testDataSet):
-    lr=float(config['ai'].get('LR',None))
+def train(dataSet,time,testDataSet):#训练的主函数
+    lr=float(config['ai'].get('LR',None))#获取学习率
 
+    #获取CNN的通道数,记得一定要转成int
     inplane=int(config['ai'].get('inplane',None))
     outplane=int(config['ai'].get('outplane',None))
     outPlaneMap=int(config['ai'].get('outPlaneMap',None))
@@ -200,11 +206,12 @@ def train(dataSet,time,testDataSet):
         EPOCH=4
 
     criterion=Loss()
+    #决定三个神经网络的出入通道
     feature,policy,value=loadModel(inplane,outplane,outPlaneMap,block)
     dataLoader=DataLoader(dataSet,batch_size=batchSize,collate_fn=collateFn,shuffle=True,num_workers=5,drop_last=True)
     jointParams=list(feature.parameters())+list(policy.parameters())+list(value.parameters())
 
-    optimizer=torch.optim.Adam(jointParams,lr=lr) if ADAM ==1 else torch.optim.SGD(jointParams,lr=lr,weight_decay=L2_REG,momentum=MOMENTUM)
+    optimizer=torch.optim.Adam(jointParams,lr=lr) if ADAM==1 else torch.optim.SGD(jointParams,lr=lr,weight_decay=L2_REG,momentum=MOMENTUM)
 
     logging.info('共%d个EPOCH'%EPOCH)
     epochLoss=[]
@@ -220,6 +227,7 @@ def train(dataSet,time,testDataSet):
                 batchState=state[0:batchSize]
                 batchWinner=winnerList[0:batchSize]
                 batchProbas=probasList[0:batchSize]
+                #转张量
                 batchState=torch.tensor(batchState,dtype=torch.float,device=DEVICE)
                 batchWinner=torch.tensor(batchWinner,dtype=torch.float,device=DEVICE)
                 batchProbas=torch.tensor(batchProbas,dtype=torch.float,device=DEVICE)
@@ -229,7 +237,7 @@ def train(dataSet,time,testDataSet):
                 featureMaps=feature(batchState.clone().detach())
                 winner=policy(featureMaps)
                 probas=value(featureMaps)
-                loss=criterion.forward(winner,batchWinner,probas,batchProbas)
+                loss=criterion(winner,batchWinner,probas,batchProbas)
                 loss.backward()
                 optimizer.step()
                 singleLoss.append(float(loss))
@@ -241,8 +249,8 @@ def train(dataSet,time,testDataSet):
                 batchWinnerList.append(wList[0])
             batchLoss.append(numpy.mean(singleLoss))
             epochWinnerList.append(numpy.mean(batchWinnerList))
-            logging.info( "当前epoch=[%d] 共[%d]个,index=[%d] 到[%d]结束训练 批次loss=%s,time=%d"
-                          %(i+1,EPOCH,batchID+1,time,numpy.mean(singleLoss),getDatetime()['timeformat']))
+            logging.info("当前epoch=[%s] 共[%s]个,index=[%s] 到[%s]结束训练 批次loss=%s,time=%s"
+                         %(i+1,EPOCH,batchID+1,time,numpy.mean(singleLoss),getDatetime()['timeformat']))
         logging.info("训练完一个epoch,开始测试")
         try:
             test(testDataSet)
@@ -271,6 +279,7 @@ if __name__ == '__main__':
 
     testData=data[batchSize*105:batchSize*105+5]
     #test(testData)
+    logging.info("共%d个batch"%int(len(trainData)/batchSize))
     myDataSet=MyDataset(trainData)
     train(myDataSet,int(len(trainData)/batchSize),testData)
     endtime=getDatetime()['timeformat']
