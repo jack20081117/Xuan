@@ -190,8 +190,8 @@ def test(dataSet):#测试模块
         f.write('\n')
     logging.info('保存数据成功')
 
-def train(dataSet,time,testDataSet):#训练的主函数
-    lr=float(config['ai'].get('LR',None))#获取学习率
+def train(dataSet,times,testDataSet):#训练的主函数
+    LR=float(config['ai'].get('LR',None))#获取学习率
 
     #获取CNN的通道数,记得一定要转成int
     inplane=int(config['ai'].get('inplane',None))
@@ -209,10 +209,10 @@ def train(dataSet,time,testDataSet):#训练的主函数
     criterion=Loss()
     #决定三个神经网络的出入通道
     feature,policy,value=loadModel(inplane,outplane,outPlaneMap,block)
-    dataLoader=DataLoader(dataSet,batch_size=batchSize,collate_fn=collateFn,shuffle=True,num_workers=5,drop_last=True)
+    dataLoader=DataLoader(dataSet,batch_size=batchSize,collate_fn=collateFn,shuffle=True,num_workers=4,drop_last=True)
     jointParams=list(feature.parameters())+list(policy.parameters())+list(value.parameters())
 
-    optimizer=torch.optim.Adam(jointParams,lr=lr) if ADAM==1 else torch.optim.SGD(jointParams,lr=lr,weight_decay=L2_REG,momentum=MOMENTUM)
+    optimizer=torch.optim.Adam(jointParams,lr=LR) if ADAM==1 else torch.optim.SGD(jointParams,lr=LR,weight_decay=L2_REG,momentum=MOMENTUM)
 
     logging.info('共%d个EPOCH'%EPOCH)
     epochLoss=[]
@@ -251,7 +251,7 @@ def train(dataSet,time,testDataSet):#训练的主函数
             batchLoss.append(numpy.mean(singleLoss))
             epochWinnerList.append(numpy.mean(batchWinnerList))
             logging.info("当前epoch=[%s] 共[%s]个,index=[%s] 到[%s]结束训练 批次loss=%s,time=%s"
-                         %(i+1,EPOCH,batchID+1,time,numpy.mean(singleLoss),getDatetime()['timeformat']))
+                         %(i+1,EPOCH,batchID+1,times,numpy.mean(singleLoss),getDatetime()['timeformat']))
         logging.info("训练完一个epoch,开始测试")
         try:
             test(testDataSet)
