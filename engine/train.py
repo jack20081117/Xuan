@@ -154,7 +154,7 @@ def test(dataSet):#测试模块
     engine=Xuan()
     accuracy=[]#精度
     for i in range(len(dataSet)):
-        sgf=dataSet[i]['sgf']
+        sgf=dataSet[i]
         goban,winner,parsedSgf,stringList=go.parseSgf2NetworkData(sgf)
         currentGoban=[]
 
