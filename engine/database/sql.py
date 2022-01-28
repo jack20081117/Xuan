@@ -1,14 +1,14 @@
 selectTest='select * from t'
 
-selectGoData="select sgf,black,white,createtime,hash from goData"
-selectGoDataPlus="select sgf,black,white,createtime,hash from goData {}"
-selectCountFileRead="select count(*) count from fileRead where filename='{}'"
-selectCountGoData='select count(*) count from goData'
+selectGoData="select sgf,black,white,createtime,hash from go_data"
+selectGoDataPlus="select sgf,black,white,createtime,hash from go_data {}"
+selectCountFileRead="select count(*) count from file_read where filename='{}'"
+selectCountGoData='select count(*) count from go_data'
 
-insertGoData="insert into goData (sgf,black,white,createtime,hash) values ('{}','{}','{}','{}','{}')"
-insertFileRead="insert into fileRead (filename) values ('{}')"
+insertGoData="insert into go_data (sgf,black,white,createtime,hash) values ('{}','{}','{}','{}','{}')"
+insertFileRead="insert into file_read (filename) values ('{}')"
 
 vacuum='vacuum'
 
-deleteGoData='delete from goData'
-deleteFileRead='delete from fileRead'
+deleteGoData='delete from go_data'
+deleteFileRead='delete from file_read'

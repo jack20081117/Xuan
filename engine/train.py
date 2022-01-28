@@ -61,7 +61,7 @@ def collateFn(data):
 
     for i in range(len(data)):
         singleData=data[i]
-        goban,winner,parsedSgf,stringList=go.parseSingleData(singleData)
+        goban,winner,parsedSgf,stringList=go.parseSgf2NetworkData(singleData)
 
         for j in range(len(goban)-1):
             #随机取棋盘的一块值

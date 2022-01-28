@@ -338,6 +338,7 @@ class Go(object):
 
     def parseSingleData(self,data):#解析数据集传来的Sgf
         sgf=data['sgf']
+        if isinstance(sgf,tuple):sgf=sgf[0]
         self.__init__()
         parsedSgf=self.parseSgf2Goban(sgf)
         additionalSgf=self.parseAdditionalSgf(sgf)
