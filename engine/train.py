@@ -77,14 +77,15 @@ def collateFn(data):
             currentColor=currentDict['color']
             currentBoard=goban[rand]
 
-            if currentColor=='white':
-                colorSetNum=0
-                myColor=-1
-                oppoColor=1
-            else:
+            #上一手是黑下,那么引擎要关注白的局面,反之也是
+            if currentColor=='black':
                 colorSetNum=1
                 myColor=1
                 oppoColor=-1
+            else:
+                colorSetNum=0
+                myColor=-1
+                oppoColor=1
             #获取己方和对手方的最近的7步棋
             myLast7Boards,oppoLast7Boards=go.getLastBoard(goban,j,1,1)
             #将原生的棋盘数据抽成己方的棋盘和对手方的棋盘,其他位置全0处理
