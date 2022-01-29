@@ -1,10 +1,10 @@
-import json,os,logging
+import json,os,logging;logging.basicConfig(level=logging.INFO)
 from config import *
 from config import GLOBAL_DICT as gl
 from src.tools import *
 from src.go import Go
 from ai.datacenter import DataCenter
-from ai.dataset import MyDataset
+from ai.dataset import MyDataSet
 from torch.utils.data import DataLoader
 import torch,numpy,platform
 
@@ -23,7 +23,7 @@ gl['modelPath']=config['model']
 gl['ai']=config['ai']
 DEVICE=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 logging.info("DEVICE=%s"%DEVICE)
-batchSize=int(config['ai']['BATCHSIZE'])
+batchSize=int(config['ai'].get('BATCHSIZE',None))
 checkPoint=0
 go=Go()
 
@@ -38,8 +38,6 @@ def getDataSet()->list:
     current=os.path.join(dbpath,config['db'].get('current',None))
     ai=os.path.join(dbpath,config['db'].get('ai',None))
     Jack=os.path.join(dbpath,config['db'].get('Jack',None))
-    dbpath=os.path.join(dbpath,config['db'].get('current',None))
-    gl['dbpath']=dbpath
 
     model={
         'old':old,
@@ -54,7 +52,7 @@ def getDataSet()->list:
     allData=dataCenter.getAllDataSet()
     return allData
 
-def collateFn(data):
+def collateFn(data:list)->tuple:
     state=[]
     winnerList=[]
     probasList=[]
@@ -190,7 +188,7 @@ def test(dataSet):#测试模块
         f.write('\n')
     logging.info('保存数据成功')
 
-def train(dataSet,times,testDataSet):#训练的主函数
+def train(dataSet:MyDataset,times,testDataSet):#训练的主函数
     LR=float(config['ai'].get('LR',None))#获取学习率
 
     #获取CNN的通道数,记得一定要转成int
@@ -209,7 +207,7 @@ def train(dataSet,times,testDataSet):#训练的主函数
     criterion=Loss()
     #决定三个神经网络的出入通道
     feature,policy,value=loadModel(inplane,outplane,outPlaneMap,block)
-    dataLoader=DataLoader(dataSet,batch_size=batchSize,collate_fn=collateFn,shuffle=True,num_workers=4,drop_last=True)
+    dataLoader=DataLoader(dataSet,batch_size=batchSize,collate_fn=collateFn,shuffle=True,num_workers=0,drop_last=True)
     jointParams=list(feature.parameters())+list(policy.parameters())+list(value.parameters())
 
     optimizer=torch.optim.Adam(jointParams,lr=LR) if ADAM==1 else torch.optim.SGD(jointParams,lr=LR,weight_decay=L2_REG,momentum=MOMENTUM)
@@ -281,7 +279,7 @@ if __name__ == '__main__':
     testData=data[batchSize*105:batchSize*105+5]
     #test(testData)
     logging.info("共%d个batch"%int(len(trainData)/batchSize))
-    myDataSet=MyDataset(trainData)
+    myDataSet=MyDataSet(trainData)
     train(myDataSet,int(len(trainData)/batchSize),testData)
     endtime=getDatetime()['timeformat']
     logging.info("训练完毕,开始时间:%s,结束时间:%s"%(begintime,endtime))
