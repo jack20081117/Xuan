@@ -1,9 +1,11 @@
-import os,logging
+import os,logging;logging.basicConfig(level=logging.INFO)
 from src.net import Server
+from src.tools import *
 from config import GLOBAL_DICT as gl
 from config import *
 
 def hello():
+    bless()
     print('''
     X     X
      XX XX   UU   UU     A     NN   N

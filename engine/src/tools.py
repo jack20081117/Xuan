@@ -60,3 +60,29 @@ def getDatetime():
 
 def loopFor2D(List:list):
     return [item for subList in List for item in subList]
+
+def bless():
+    print('''
+
+       ┌─┐       ┌─┐
+    ┌──┘ ┴───────┘ ┴──┐
+    │   Jack  Zhang   │
+    │                 │
+    │  └┬┘       └┬┘  │
+    │                 │
+    │       ───       │
+    │                 │
+    └───┐         ┌───┘
+        │         │
+        │         │
+        │         │
+        │ X   X   └──────────────┐
+        │  X X  u  u aaaa   n  n │
+        │   X   u  u a  a   nn n ├─┐
+        │  X X  u  u a  a   n nn ┌─┘
+        │ X   X  uu  aaa aa n  n │
+        └─┐  ┐  ┌───────┬──┐  ┌──┘
+          │ ─┤ ─┤       │ ─┤ ─┤
+          └──┴──┘       └──┴──┘
+    神兽保佑
+    代码无BUG!''')
