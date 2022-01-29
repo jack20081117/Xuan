@@ -2,7 +2,7 @@ from src.tools import *
 from config import *
 
 import numpy,logging,json,copy
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 class Go(object):
     board=None#棋盘
@@ -352,8 +352,8 @@ class Go(object):
             goban.append(board)
             stringList.append(string)
         RE=additionalSgf['RE']#游戏结果
-        if RE[0]!='W' and RE[0]!='B' and RE[0]!=UNKNOWN:#棋谱记录了胜者就赋值,没有的话就自己计算
-            RE[0]=UNKNOWN
+        if RE[0]!='W' and RE[0]!='B' and RE!=UNKNOWN:#棋谱记录了胜者就赋值,没有的话就自己计算
+            RE=UNKNOWN
         if RE!=UNKNOWN:
             winner=RE[0]
         else:
@@ -435,6 +435,7 @@ class Go(object):
                 self.string=backupString
                 self.robX=backupRobX
                 self.robY=backupRobY
+                logging.debug('不能在导致自己死棋的位置落子!')
                 logging.debug('GoLogic校验失败!')
                 return self.returnData(False)
         logging.debug('GoLogic校验成功!')

@@ -1,5 +1,6 @@
 from src.go import Go
-import time
+import time,logging
+logging.basicConfig(level=logging.DEBUG)
 
 #弈客300手大型棋谱
 #重要的事情说三遍:
@@ -12,7 +13,7 @@ go=Go()
 if __name__ == '__main__':
     example="(;GM[1] FF[4]  SZ[19]  GN[]  DT[2021-12-18]  PB[Anonymous]  PW[杰克]  BR[9段]  WR[3段]  KM[375]HA[0]RU[Chinese]AP[GNU Go:3.8]RN[3]RE[B+R]TM[600]TC[3]TT[30]AP[honinbo]RL[0] "
     result=go.parseAdditionalSgf(example)
-    print(result)
+    logging.debug(result)
 
     time.sleep(1)
 
