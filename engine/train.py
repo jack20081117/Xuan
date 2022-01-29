@@ -1,4 +1,4 @@
-import json,os,logging;logging.basicConfig(level=logging.ERROR)
+import json,os,logging;logging.basicConfig(level=logging.INFO)
 from config import *
 from config import GLOBAL_DICT as gl
 from src.tools import *
@@ -236,8 +236,8 @@ def train(dataSet:MyDataSet,times,testDataSet):#训练的主函数
 
                 #用提取器拿到特征,传给策略器和评价器
                 featureMaps=feature(batchState.clone().detach())
-                winner=policy(featureMaps)
-                probas=value(featureMaps)
+                winner=value(featureMaps)
+                probas=policy(featureMaps)
                 loss=criterion(winner,batchWinner,probas,batchProbas)
                 loss.backward()
                 optimizer.step()
@@ -248,7 +248,6 @@ def train(dataSet:MyDataSet,times,testDataSet):#训练的主函数
                 length-=batchSize
                 wList=winner.tolist()
                 batchWinnerList.append(wList[0])
-                exit()
             batchLoss.append(numpy.mean(singleLoss))
             epochWinnerList.append(numpy.mean(batchWinnerList))
             logging.info("当前epoch=[%s] 共[%s]个,index=[%s] 到[%s]结束训练 批次loss=%s,time=%s"

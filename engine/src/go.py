@@ -38,7 +38,7 @@ class Go(object):
             return False
 
         subString=self.string['black'] if self.isBlack else self.string['white']
-        logging.info("get string info:x=%d,y=%d"%(x,y))
+        logging.debug("get string info:x=%d,y=%d"%(x,y))
         if x in subString and y in subString[x]:
             num=subString[x][y]
             return num
@@ -51,7 +51,7 @@ class Go(object):
                 return s
 
     def combineCurrentString(self,x,y,src,*args):#将(x,y)与四周的点所在棋串进行合并
-        logging.info("combine current string 处理前 string:",self.string)
+        logging.debug("combine current string 处理前 string:",self.string)
         subString=self.string['black'] if self.isBlack else self.string['white']
         if x not in subString:
             subString[x]={}
@@ -66,24 +66,24 @@ class Go(object):
                             for subkey in subString[key]:
                                 if subString[key][subkey]==s:
                                     subString[key][subkey]=src
-                    logging.info("即将删除棋串%s"%subString[s])
+                    logging.debug("即将删除棋串%s"%subString[s])
                     del subString[s]
 
     def combine(self,x,y,isBlack=None):
         if isBlack is not None:self.isBlack=isBlack
         up,down,left,right=getFourDirect(x,y)
 
-        logging.info('get string info...')
+        logging.debug('get string info...')
         #获取四周的点的棋串编号
         su=self.getStringInfo(up['x'],up['y'])
         sd=self.getStringInfo(down['x'],down['y'])
         sl=self.getStringInfo(left['x'],left['y'])
         sr=self.getStringInfo(right['x'],right['y'])
-        logging.info('su={},sd={},sl={},sr={}'.format(su,sd,sl,sr))
+        logging.debug('su={},sd={},sl={},sr={}'.format(su,sd,sl,sr))
 
         if (su is False or su==-1) and (sd is False or sd==-1) and (sl is False or sl==-1) and (sr is False or sr==-1):
             #四周都不是同色棋子,则新增了一个棋串
-            logging.info('combine 检测到需要新增string:',self.string)
+            logging.debug('combine 检测到需要新增string:',self.string)
             stringNum=self.string['num']
             subString=self.string['black'] if self.isBlack else self.string['white']
             if x not in subString:
@@ -93,30 +93,30 @@ class Go(object):
             subString[x][y]=stringNum
             subString[stringNum].append({'x':x,'y':y})
             self.string['num']+=1
-            logging.info('combine result:%s'%self.string)
+            logging.debug('combine result:%s'%self.string)
         else:
-            logging.info('combine 检测到需要合并string:',self.string)
+            logging.debug('combine 检测到需要合并string:',self.string)
             src=self.getSrcString(su,sd,sl,sr)
             self.combineCurrentString(x,y,src,su,sd,sl,sr)
-            logging.info('combine result:%s'%self.string)
+            logging.debug('combine result:%s'%self.string)
         return None
 
     def doStep(self,x,y):#落子在(x,y)
         if x<0 or x>18 or y<0 or y>18:
-            logging.warning('x,y must be in [0,18]!')
+            logging.debug('x,y must be in [0,18]!')
         num=1 if self.isBlack else -1
         self.board[x][y]=num
 
     def checkStep(self,x,y):#检查(x,y)是否已有棋子
         if x<0 or x>18 or y<0 or y>18:
-            logging.warning('x,y must be in [0,18]!')
+            logging.debug('x,y must be in [0,18]!')
         if self.board[x][y]:
-            logging.warning('不能在已有棋子的位置落子!')
+            logging.debug('不能在已有棋子的位置落子!')
             return False
         return True
 
     def doKill(self,x,y,flag):
-        logging.info('kill string:%s'%self.string)
+        logging.debug('kill string:%s'%self.string)
         directs=getFourDirect(x,y)
         killed=[]
         for direct in directs:
@@ -131,7 +131,7 @@ class Go(object):
         color='black' if flag==1 else 'white'
         subString=self.string[color]
         num=subString[x][y]
-        logging.info('check kill 检查的棋串为:%d'%num)
+        logging.debug('check kill 检查的棋串为:%d'%num)
         L=subString[num]#棋串
 
         for i in range(len(L)):
@@ -142,14 +142,14 @@ class Go(object):
             for direct in directs:
                 if 0<=direct['x']<19 and 0<=direct['y']<19:
                     if not self.board[direct['x']][direct['y']]:
-                        logging.info('棋串%d为活棋'%num)
+                        logging.debug('棋串%d为活棋'%num)
                         return False
 
-        logging.info('棋串%d为死棋'%num)
+        logging.debug('棋串%d为死棋'%num)
         return num
 
     def cleanString(self,num):#把编号为num的棋串从棋盘上删除
-        logging.info('clean string 正在删除棋串:%d'%num)
+        logging.debug('clean string 正在删除棋串:%d'%num)
         if num in self.string['black']: color='black'
         elif num in self.string['white']: color='white'
         else: return []
@@ -157,7 +157,7 @@ class Go(object):
         subString=self.string[color]
         L=subString[num]
         if L is None:
-            logging.info('棋串%d已被杀死'%num)
+            logging.debug('棋串%d已被杀死'%num)
             return []
         for i in range(len(L)):
             x,y=L[i]['x'],L[i]['y']
@@ -199,10 +199,10 @@ class Go(object):
         for i in range(len(data)):
             singleData=data[i]
             x,y,color=singleData['x'],singleData['y'],singleData['color']
-            logging.info('目前是第%d步棋,x=%d,y=%d,color=%s'%(i+1,x,y,color))
+            logging.debug('目前是第%d步棋,x=%d,y=%d,color=%s'%(i+1,x,y,color))
             self.simpleGoLogic(x,y,color)
-        logging.info('board->%s'%self.board)
-        logging.info('string->%s'%self.string)
+        logging.debug('board->%s'%self.board)
+        logging.debug('string->%s'%self.string)
 
     def transferBoard2String(self,board):
         self.__init__()
@@ -263,7 +263,7 @@ class Go(object):
         return blanks
 
     def checkWinner(self,board):
-        logging.info('checking winner...')
+        logging.debug('checking winner...')
         board=self.transferBoard(board,-1,2)
         npBoard=numpy.copy(board)
         for item in self.findBlanks(numpy.copy(board)):
@@ -278,7 +278,7 @@ class Go(object):
         white=npBoard[npBoard==2].size+npBoard[npBoard==4].size
         common=npBoard[npBoard==9].size
 
-        logging.info('black:%d,white:%d,common:%d'%(black,white,common))
+        logging.debug('black:%d,white:%d,common:%d'%(black,white,common))
 
         return {
             'black':black,
@@ -392,7 +392,7 @@ class Go(object):
         backupRobX,backupRobY=self.robX,self.robY
         checkStep=self.checkStep(x,y)#检查(x,y)是否已有棋子
         if not checkStep:
-            logging.warning('GoLogic校验失败!')
+            logging.debug('GoLogic校验失败!')
             return self.returnData(False)
         #判断自杀逻辑是反过来的
         if color=='black':
@@ -412,18 +412,18 @@ class Go(object):
                 killed=self.cleanString(killResult[i])
                 if len(killed)==1:
                     #在这里判断打劫
-                    logging.info('GoLogic正在判断打劫,robX={},robY={},x={},y={}'.format(self.robX,self.robY,x,y))
+                    logging.debug('GoLogic正在判断打劫,robX={},robY={},x={},y={}'.format(self.robX,self.robY,x,y))
                     if (self.robX is not None and self.robY is not None)\
                     and int(self.robX)==int(x) and int(self.robY)==int(y):
-                        logging.warning('无法在打劫点落子!')
-                        logging.warning('GoLogic校验失败!')
+                        logging.debug('无法在打劫点落子!')
+                        logging.debug('GoLogic校验失败!')
                         self.board=backupBoard
                         self.string=backupString
                         return self.returnData(False)
                     #如果之前不是打劫点,则更新打劫点
                     self.robX=killed[0]['x']
                     self.robY=killed[0]['y']
-                    logging.info('保存了目前打劫点:x={},y={}'.format(self.robX,self.robY))
+                    logging.debug('保存了目前打劫点:x={},y={}'.format(self.robX,self.robY))
                 else:
                     #如果之前有打劫点,则现在清空
                     self.robX=None
@@ -435,9 +435,9 @@ class Go(object):
                 self.string=backupString
                 self.robX=backupRobX
                 self.robY=backupRobY
-                logging.warning('GoLogic校验失败!')
+                logging.debug('GoLogic校验失败!')
                 return self.returnData(False)
-        logging.info('GoLogic校验成功!')
+        logging.debug('GoLogic校验成功!')
         return self.returnData(True)
 
     def getLastBoard(self,boardList,index,myColor,oppoColor):#获取最近的7步棋
