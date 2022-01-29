@@ -133,7 +133,7 @@ class Xuan(object):#围棋AI的核心模块
         legalMoves=self.getLegalMoves(resultList)
         return legalMoves,probas,winner,self.string,self.board
 
-    def getLegalMoves(self,allMoves,threshold=5):#获取合法的落子点,默认取5个
+    def getLegalMoves(self,allMoves):#获取合法的落子点,默认取5个
         threshold=int(self.aiConfig['THRESHOLD'])
         result=[]
         nums=0
@@ -161,7 +161,7 @@ class Xuan(object):#围棋AI的核心模块
                     'x':x,
                     'y':y
                 })
-        logging.warning("非法落子点数量:%d"%len(illegals))
+        logging.info("非法落子点数量:%d"%len(illegals))
         return result
 
     def getStringAndBoardFromFront(self,goban):#根据前端发来的棋谱获取棋盘和棋串
