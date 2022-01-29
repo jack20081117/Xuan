@@ -103,15 +103,15 @@ class Go(object):
 
     def doStep(self,x,y):#落子在(x,y)
         if x<0 or x>18 or y<0 or y>18:
-            logging.error('x,y must be in [0,18]!')
+            logging.warning('x,y must be in [0,18]!')
         num=1 if self.isBlack else -1
         self.board[x][y]=num
 
     def checkStep(self,x,y):#检查(x,y)是否已有棋子
         if x<0 or x>18 or y<0 or y>18:
-            logging.error('x,y must be in [0,18]!')
+            logging.warning('x,y must be in [0,18]!')
         if self.board[x][y]:
-            logging.error('不能在已有棋子的位置落子!')
+            logging.warning('不能在已有棋子的位置落子!')
             return False
         return True
 
@@ -392,7 +392,7 @@ class Go(object):
         backupRobX,backupRobY=self.robX,self.robY
         checkStep=self.checkStep(x,y)#检查(x,y)是否已有棋子
         if not checkStep:
-            logging.error('GoLogic校验失败!')
+            logging.warning('GoLogic校验失败!')
             return self.returnData(False)
         #判断自杀逻辑是反过来的
         if color=='black':
@@ -415,8 +415,8 @@ class Go(object):
                     logging.info('GoLogic正在判断打劫,robX={},robY={},x={},y={}'.format(self.robX,self.robY,x,y))
                     if (self.robX is not None and self.robY is not None)\
                     and int(self.robX)==int(x) and int(self.robY)==int(y):
-                        logging.error('无法在打劫点落子!')
-                        logging.error('GoLogic校验失败!')
+                        logging.warning('无法在打劫点落子!')
+                        logging.warning('GoLogic校验失败!')
                         self.board=backupBoard
                         self.string=backupString
                         return self.returnData(False)
@@ -435,7 +435,7 @@ class Go(object):
                 self.string=backupString
                 self.robX=backupRobX
                 self.robY=backupRobY
-                logging.error('GoLogic校验失败!')
+                logging.warning('GoLogic校验失败!')
                 return self.returnData(False)
         logging.info('GoLogic校验成功!')
         return self.returnData(True)

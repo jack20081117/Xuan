@@ -1,4 +1,4 @@
-import json,os,logging;logging.basicConfig(level=logging.INFO)
+import json,os,logging;logging.basicConfig(level=logging.ERROR)
 from config import *
 from config import GLOBAL_DICT as gl
 from src.tools import *
@@ -38,6 +38,7 @@ def getDataSet()->list:
     current=os.path.join(dbpath,config['db'].get('current',None))
     ai=os.path.join(dbpath,config['db'].get('ai',None))
     Jack=os.path.join(dbpath,config['db'].get('Jack',None))
+    gl['dbpath']=current
 
     model={
         'old':old,
@@ -188,7 +189,7 @@ def test(dataSet):#测试模块
         f.write('\n')
     logging.info('保存数据成功')
 
-def train(dataSet:MyDataset,times,testDataSet):#训练的主函数
+def train(dataSet:MyDataSet,times,testDataSet):#训练的主函数
     LR=float(config['ai'].get('LR',None))#获取学习率
 
     #获取CNN的通道数,记得一定要转成int
@@ -233,6 +234,7 @@ def train(dataSet:MyDataset,times,testDataSet):#训练的主函数
                 batchProbas=torch.reshape(batchProbas,(batchSize,-1))
                 optimizer.zero_grad()
 
+                #用提取器拿到特征,传给策略器和评价器
                 featureMaps=feature(batchState.clone().detach())
                 winner=policy(featureMaps)
                 probas=value(featureMaps)
@@ -246,6 +248,7 @@ def train(dataSet:MyDataset,times,testDataSet):#训练的主函数
                 length-=batchSize
                 wList=winner.tolist()
                 batchWinnerList.append(wList[0])
+                exit()
             batchLoss.append(numpy.mean(singleLoss))
             epochWinnerList.append(numpy.mean(batchWinnerList))
             logging.info("当前epoch=[%s] 共[%s]个,index=[%s] 到[%s]结束训练 批次loss=%s,time=%s"
