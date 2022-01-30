@@ -323,7 +323,7 @@ class Go(object):
         }
 
     @staticmethod
-    def parseGoban2Sgf(gobanData)->object:#把Xuan能识别的棋谱信息(Goban)保存成方便入库的信息(Sgf)
+    def parseGoban2Sgf(gobanData)->dict:#把Xuan能识别的棋谱信息(Goban)保存成方便入库的信息(Sgf)
         sgf=''
         for i in range(len(gobanData)):
             x=ALPHABET[int(gobanData[i]['x'])+1]#Sgf的x,y坐标为a-s,对应1-19,查询时需要加1
