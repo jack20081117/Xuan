@@ -1,9 +1,4 @@
 import configparser
-#python的configparser模块可以读取.ini配置文件中的内容
-#config.ini
-#[text]
-#greet=hello
-#相当于python中的config['text']['greet']='hello'
 
 ALPHABET={
     'a':1,'b':2,'c':3,'d':4,'e':5,
@@ -39,8 +34,7 @@ WINNER={
 
 GLOBAL_DICT={}
 
-#配置文件目录
 CONFIGFILEPATH='./config.ini'
-#读取配置文件
+
 CONFIG=configparser.ConfigParser()
 CONFIG.read(CONFIGFILEPATH,encoding='utf-8')
