@@ -25,8 +25,8 @@ torch.manual_seed(RANDOM_SEED)
 class CNN(Module):
     def __init__(self):
         super(CNN,self).__init__()
-        self.conv1=nn.Conv2d(1,10,kernel_size=5,padding=2)
-        self.conv2=nn.Conv2d(10,20,kernel_size=5,padding=2)
+        self.conv1=nn.Conv2d(1,10,kernel_size=5,padding=2,stride=1)#1*10*28*28
+        self.conv2=nn.Conv2d(10,20,kernel_size=5,padding=2,stride=1)#10*20*28*28
 
         self.fc1=nn.Linear(20*28*28,500)
         self.fc2=nn.Linear(500,10)
@@ -84,6 +84,7 @@ if __name__ == '__main__':
                                                           torchvision.transforms.ToTensor(),
                                                           torchvision.transforms.Normalize((0.1307,),(0.3081,))
                                                       ])),batch_size=BATCHSIZETEST,shuffle=True)
+    
     examples=enumerate(testLoader)
     batchIdx,(exampleData,exampleTargets)=next(examples)
     network=CNN()
