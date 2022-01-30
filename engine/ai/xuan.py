@@ -131,14 +131,14 @@ class Xuan(object):#围棋AI的核心模块
         legalMoves=self.getLegalMoves(allMoves=resultList)
         return legalMoves,probas,winner,self.string,self.board
 
-    def getLegalMoves(self,allMoves,threshold=0):#获取合法的落子点,默认取10个
+    def getLegalMoves(self,allMoves,threshold=0):#获取allMoves中合法的落子点,默认取10个
         if not threshold:
             threshold=int(self.aiConfig['THRESHOLD'])
-        result=[]
-        nums=0
-        illegals=[]
+        legals=[]#合法落子点
+        illegals=[]#非法落子点
+        legalNum=0
         for i in range(len(allMoves)):
-            if nums>=threshold:
+            if legalNum>=threshold:
                 break
             singleMove=allMoves[i]
             x,y=singleMove['x'],singleMove['y']
@@ -147,15 +147,15 @@ class Xuan(object):#围棋AI的核心模块
             self.go.string=copy.deepcopy(self.string)
             self.go.robX=self.robX
             self.go.robY=self.robY
-            success,board,string,robX,robY=self.go.GoLogic(x=x,y=y,color=self.color)
-            if success:
-                result.append({'x':x,'y':y})
-                nums+=1
-            else:
+            success,board,string,robX,robY=self.go.GoLogic(x=x,y=y,color=self.color)#检查下(x,y)是否符合围棋逻辑
+            if success:#符合围棋逻辑,是合法的落子点
+                legals.append({'x':x,'y':y})
+                legalNum+=1
+            else:#不符合围棋逻辑,是非法的落子点
                 illegals.append({'x':x,'y':y})
         logging.info("本次获取的非法落子点 :>> %s"%illegals)
         logging.info("非法落子点数量:%d"%len(illegals))
-        return result
+        return legals
 
     def getStringAndBoardFromFront(self,goban):#根据前端发来的棋谱获取棋盘和棋串
         self.go.__init__()
