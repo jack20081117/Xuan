@@ -10,6 +10,7 @@ front/static
 front/build/*
 !front/build/icons
 
+!README.md
 !.gitkeep
 
 package-lock.json
