@@ -12,25 +12,31 @@ class Node(object):
         self.legalMoves=legalMoves
         self.probas=probas
         self.parent=parent#父节点
-        self.son=[]#子树集合
+        self.children=[]#子树集合
         self.num=0#遍历的次数
 
     def __str__(self):
-        return 'Node object,son:%s'%self.son
+        return 'Node object,children:%s'%self.children
 
     __repr__=__str__
 
     def isLeaf(self):
-        return len(self.son)==0
+        return len(self.children)==0
 
-    def getSon(self):
-        return self.son
+    def getChildren(self):
+        return self.children
+
+    def setChildren(self,children:list):
+        self.children=children
 
     def getParent(self):
         return self.parent
 
+    def setParent(self,parent):
+        self.parent=parent
+
     def expand(self,string,board,legalMoves,probas):
-        self.son.append(Node(string=string,board=board,legalMoves=legalMoves,probas=probas,parent=self))
+        self.children.append(Node(string=string,board=board,legalMoves=legalMoves,probas=probas,parent=self))
 
 class MCTS(object):
     engine=None

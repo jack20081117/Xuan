@@ -1,3 +1,5 @@
+#训练模块
+
 import json,os,logging;logging.basicConfig(level=logging.INFO)
 from config import *
 from config import GLOBAL_DICT as gl
@@ -14,7 +16,7 @@ from model.value import ValueNet
 from model.feature import Extractor
 from ai.xuan import Xuan
 
-osType=platform.system()
+osType=platform.system()#Windows or Linux or Mac?
 
 logFileName='./savedModel/trainData.txt'
 
@@ -27,17 +29,17 @@ batchSize=int(config['ai'].get('BATCHSIZE',None))
 checkPoint=0
 go=Go()
 
-featurePath=config['model'].get('feature',None)
-policyPath=config['model'].get('policy',None)
-valuePath=config['model'].get('value',None)
+featurePath=config['model'].get('feature',None)#feature.bin
+policyPath=config['model'].get('policy',None)#policy.bin
+valuePath=config['model'].get('value',None)#value.bin
 
 def getDataSet()->list:
     dbpath=os.path.dirname(os.path.realpath(__file__))
     gl['logpath']=dbpath
-    old=os.path.join(dbpath,config['db'].get('old',None))
-    current=os.path.join(dbpath,config['db'].get('current',None))
-    ai=os.path.join(dbpath,config['db'].get('ai',None))
-    Jack=os.path.join(dbpath,config['db'].get('Jack',None))
+    old=os.path.join(dbpath,config['db'].get('old',None))#1940.db
+    current=os.path.join(dbpath,config['db'].get('current',None))#2000.db
+    ai=os.path.join(dbpath,config['db'].get('ai',None))#ai.db
+    Jack=os.path.join(dbpath,config['db'].get('Jack',None))#Jack.db
 
     model={
         'old':old,
@@ -52,7 +54,7 @@ def getDataSet()->list:
     allData=dataCenter.getAllDataSet()
     return allData
 
-def collateFn(data:list)->tuple:
+def collateFn(data:list)->tuple:#组成训练数据的函数
     state=[]
     winnerList=[]
     probasList=[]
@@ -111,7 +113,7 @@ def loadModel(inplane,outplane,outplaneMap,block):
         feature=Extractor(inplane,outplaneMap,block).to(DEVICE)
         policy=PolicyNet(outplaneMap,outplane).to(DEVICE)
         value=ValueNet(outplaneMap,outplane).to(DEVICE)
-        saveModel(feature,policy,value,True)
+        saveModel(feature,policy,value,saveFirst=True)
     return feature,policy,value
 
 def saveModel(feature,policy,value,saveFirst=False):
@@ -251,6 +253,7 @@ def train(dataSet:MyDataSet,times,testDataSet):#训练的主函数
             epochWinnerList.append(numpy.mean(batchWinnerList))
             logging.info("当前epoch=[%s] 共[%s]个,index=[%s] 到[%s]结束训练 批次loss=%s,time=%s"
                          %(i+1,EPOCH,batchID+1,times,numpy.mean(singleLoss),getDatetime()['timeformat']))
+
         logging.info("训练完一个epoch,开始测试")
         try:
             test(testDataSet)
@@ -259,6 +262,7 @@ def train(dataSet:MyDataSet,times,testDataSet):#训练的主函数
         logging.info("Average backward pass->{}".format(numpy.mean(batchLoss)))
         epochLoss.append(numpy.mean(batchLoss))
         logging.info("Epoch loss:{}".format(epochLoss))
+
         with open(logFileName,encoding='utf-8',mode='a+') as f:
             f.write(json.dumps({
                 'type':'loss',

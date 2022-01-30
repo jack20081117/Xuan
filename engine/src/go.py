@@ -287,7 +287,7 @@ class Go(object):
         }
 
     @staticmethod
-    def parseSgf2Goban(sgfData):#解析围棋的sgf文件格式,把方便入库的信息(Sgf)保存成Xuan能识别的棋谱信息(Goban)
+    def parseSgf2Goban(sgfData:str)->list:#解析围棋的sgf文件格式,把方便入库的信息(Sgf)保存成Xuan能识别的棋谱信息(Goban)
         #sgf文件格式 W为白 B为黑
         #类似(;B[ac];W[dp];...)
         #代表黑 第一行 第三列;白 第四行 第十六列
@@ -307,7 +307,7 @@ class Go(object):
         return result
 
     @staticmethod
-    def parseAdditionalSgf(sgfData):
+    def parseAdditionalSgf(sgfData:str)->dict:#解析sgf的额外信息
         RE=getSgfInfo(sgfData,'RE','')#游戏结果
         PB=getSgfInfo(sgfData,'PB','')#黑方
         PW=getSgfInfo(sgfData,'PW','')#白方
@@ -323,7 +323,7 @@ class Go(object):
         }
 
     @staticmethod
-    def parseGoban2Sgf(gobanData):#把Xuan能识别的棋谱信息(Goban)保存成方便入库的信息(Sgf)
+    def parseGoban2Sgf(gobanData)->object:#把Xuan能识别的棋谱信息(Goban)保存成方便入库的信息(Sgf)
         sgf=''
         for i in range(len(gobanData)):
             x=ALPHABET[int(gobanData[i]['x'])+1]#Sgf的x,y坐标为a-s,对应1-19,查询时需要加1
@@ -339,6 +339,7 @@ class Go(object):
     def parseSingleData(self,data):#解析数据集传来的Sgf
         sgf=data['sgf']
         if isinstance(sgf,tuple):sgf=sgf[0]
+        #每次清除围棋类的数据,很重要
         self.__init__()
         parsedSgf=self.parseSgf2Goban(sgf)
         additionalSgf=self.parseAdditionalSgf(sgf)
@@ -353,6 +354,7 @@ class Go(object):
             stringList.append(string)
         RE=additionalSgf['RE']#游戏结果
         if RE[0]!='W' and RE[0]!='B' and RE!=UNKNOWN:#棋谱记录了胜者就赋值,没有的话就自己计算
+            #出现了平局,这只有ai对局或者特殊情况才会出现,那就自己计算
             RE=UNKNOWN
         if RE!=UNKNOWN:
             winner=RE[0]
@@ -468,14 +470,14 @@ class Go(object):
     def getStringLife(self,board,L,threshold=4):#获取这个棋串有多少气,大于threshold就返回-1,不需要讨论
         life=0
         for i in range(len(L)):
-            x=L[i]['x']
-            y=L[i]['y']
+            x,y=L[i]['x'],L[i]['y']
             directs=getFourDirect(x,y)
             for direct in directs:
                 life+=self.getDotLife(direct['x'],direct['y'],board)
-        return life if life<threshold else -1
+                if life>=threshold:return -1
+        return life
 
-    def getBoardAddition(self,board,string,color):
+    def getBoardAddition(self,board,string,color)->tuple:#获取当前局面额外的信息
         myBoard=copy.deepcopy(board)
         oppoBoard=copy.deepcopy(board)
         myLifeBoard=[getEmptyBoard(),getEmptyBoard(),getEmptyBoard()]
@@ -490,39 +492,32 @@ class Go(object):
             oppoColorText='white'
         for i in range(19):
             for j in range(19):
-                if board[i][j]!=color and board[i][j]:
-                    myBoard[i][j]=0
-                if board[i][j]==color:
-                    oppoBoard[i][j]=0
+                if board[i][j]!=color and board[i][j]: myBoard[i][j]=0#不是落子方也不是空
+                if board[i][j]==color: oppoBoard[i][j]=0#落子方
         myString=copy.deepcopy(string[myColorText])
         oppoString=copy.deepcopy(string[oppoColorText])
         myArray=[[],[],[]]
         oppoArray=[[],[],[]]
         for key in myString:
-            if int(key)<19: continue
+            if int(key)<19: continue#不是棋串
             array=myString[key]
-            life=self.getStringLife(board,array)
-            if life==-1: continue
-            if life==1:
-                myArray[0].append(array)
-            if life==2:
-                myArray[1].append(array)
-            if life==3:
-                myArray[2].append(array)
+            life=self.getStringLife(board=board,L=array)
+            if life==-1: continue#节约时间
+            if life==1: myArray[0].append(array)
+            if life==2: myArray[1].append(array)
+            if life==3: myArray[2].append(array)
         for key in oppoString:
-            if int(key)<19: continue
+            if int(key)<19: continue#不是棋串
             array=oppoString[key]
-            life=self.getStringLife(board,array)
-            if life==-1: continue
-            if life==1:
-                oppoArray[0].append(array)
-            if life==2:
-                oppoArray[1].append(array)
-            if life==3:
-                oppoArray[2].append(array)
+            life=self.getStringLife(board=board,L=array)
+            if life==-1: continue#节约时间
+            if life==1: oppoArray[0].append(array)
+            if life==2: oppoArray[1].append(array)
+            if life==3: oppoArray[2].append(array)
+        #改写数组
         for k in range(3):
-            myLifeBoard[k]=self.setBoardByArray(myLifeBoard[k],myArray[k],myColor)
-            oppoLifeBoard[k]=self.setBoardByArray(oppoLifeBoard[k],oppoArray[k],oppoColor)
+            myLifeBoard[k]=self.setBoardByArray(board=myLifeBoard[k],array=myArray[k],color=myColor)
+            oppoLifeBoard[k]=self.setBoardByArray(board=oppoLifeBoard[k],array=oppoArray[k],color=oppoColor)
         return myBoard,oppoBoard,myLifeBoard,oppoLifeBoard
 
     @staticmethod
@@ -547,7 +542,7 @@ class Go(object):
 
     @staticmethod
     def getColorTextByNum(num):#传入颜色数字转文字
-        return 'black' if num==1 else 'white'
+        return 'black' if int(num)==1 else 'white'
 
     def getCurrentColorBoard(self,num):#当前是黑色,就全1,否则全0
         board=getEmptyBoard()

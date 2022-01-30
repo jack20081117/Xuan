@@ -1,5 +1,4 @@
 import copy,torch, json,logging
-
 from ai.datacenter import DataCenter
 from config import GLOBAL_DICT as gl
 from src.go import Go
@@ -54,7 +53,7 @@ class Xuan(object):#围棋AI的核心模块
         self.color=rawData['color']
 
     def parseOperator(self,data):#对从前端接收到的信息做处理
-        dataDict=json.loads(data)
+        dataDict=json.loads(data)#收到的数据转json
         if dataDict['operator']=='run':#引擎分析
             self.parseStepData(dataDict)
             goban=dataDict['goban']
@@ -72,7 +71,7 @@ class Xuan(object):#围棋AI的核心模块
                     'code':-1,
                     'message':"空棋谱不进行处理"
                 }
-            goban=json.loads(goban)
+            goban=json.loads(goban)#棋谱是单独的json,需要再解析一次
             parsedSgf=self.go.parseGoban2Sgf(goban)['sgf']
             additional=self.go.parseAdditionalSgf(parsedSgf)
             result=self.datacenter.saveGoban(parsedSgf,additional)
@@ -99,7 +98,7 @@ class Xuan(object):#围棋AI的核心模块
         state=state.reshape(1,self.inplanes,19,19)
         return state
 
-    def analyze(self,state):#分析数据结构
+    def analyze(self,state)->tuple:#分析数据结构
         featureMaps=self.feature(state.clone().detach())
         winner=self.value(featureMaps)
         probas=self.policy(featureMaps)
@@ -125,16 +124,16 @@ class Xuan(object):#围棋AI的核心模块
 
     def doAnalyze(self,goban):
         self.board,self.string,self.robX,self.robY,boardList=self.getStringAndBoardFromFront(goban=goban)
-        state=self.getPredictData(boardList)
-
+        state=self.getPredictData(boardList=boardList)
         #分析,然后获取合法的落子点
-        probas,winner=self.analyze(state)
-        resultList=self.transferAnalyze2List(probas,winner)
-        legalMoves=self.getLegalMoves(resultList)
+        probas,winner=self.analyze(state=state)
+        resultList=self.transferAnalyze2List(probas=probas,winner=winner)
+        legalMoves=self.getLegalMoves(allMoves=resultList)
         return legalMoves,probas,winner,self.string,self.board
 
-    def getLegalMoves(self,allMoves):#获取合法的落子点,默认取5个
-        threshold=int(self.aiConfig['THRESHOLD'])
+    def getLegalMoves(self,allMoves,threshold=0):#获取合法的落子点,默认取10个
+        if not threshold:
+            threshold=int(self.aiConfig['THRESHOLD'])
         result=[]
         nums=0
         illegals=[]
@@ -142,25 +141,19 @@ class Xuan(object):#围棋AI的核心模块
             if nums>=threshold:
                 break
             singleMove=allMoves[i]
-            x=singleMove['x']
-            y=singleMove['y']
+            x,y=singleMove['x'],singleMove['y']
             #初始化Go
             self.go.board=copy.deepcopy(self.board)
             self.go.string=copy.deepcopy(self.string)
             self.go.robX=self.robX
             self.go.robY=self.robY
-            success,board,string,robX,robY=self.go.GoLogic(x,y,color=self.color)
+            success,board,string,robX,robY=self.go.GoLogic(x=x,y=y,color=self.color)
             if success:
-                result.append({
-                    'x':x,
-                    'y':y
-                })
+                result.append({'x':x,'y':y})
                 nums+=1
             else:
-                illegals.append({
-                    'x':x,
-                    'y':y
-                })
+                illegals.append({'x':x,'y':y})
+        logging.info("本次获取的非法落子点 :>> %s"%illegals)
         logging.info("非法落子点数量:%d"%len(illegals))
         return result
 
