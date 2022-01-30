@@ -17,7 +17,6 @@ if __name__ == '__main__':
         hash VARCHAR(20)
     );
     ''')
-
     cursor.execute('''
     CREATE TABLE "fileRead"
     (
@@ -26,7 +25,6 @@ if __name__ == '__main__':
                 PRIMARY KEY autoincrement,
         filename VARCHAR(500)
     );''')
-
     cursor.close()
     conn.commit()
     conn.close()

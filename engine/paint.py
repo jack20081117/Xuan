@@ -37,7 +37,6 @@ def paint(allData):
                 singleData=data[j]
                 percent=singleData['percent']
                 accuracy.append(percent)
-
     plt.plot(loss)
     plt.ylabel('allLoss')
     plt.xlabel('LR={},BATCHSIZE={},epoch={}'.format(LR,BATCHSIZE,epoch))
@@ -54,13 +53,11 @@ def paint(allData):
     plt.ylabel('allAccuracy')
     plt.xlabel('LR={},BATCHSIZE={},epoch={}'.format(LR,BATCHSIZE,epoch))
     plt.show()
-
     logging.info('allLoss :>> %s'%lossMean)
     decrease=[]
     for i in range(len(lossMean)-1):
         a,b=lossMean[i],lossMean[i+1]
         decrease.append(a-b)
-
     plt.plot(decrease)
     plt.ylabel('decrease')
     plt.xlabel('LR={},BATCHSIZE={},epoch={}'.format(LR,BATCHSIZE,epoch))
