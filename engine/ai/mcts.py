@@ -1,7 +1,8 @@
 #蒙特卡洛树搜索模块
 #Monte Carlo Tree Search,简称MCTS
 
-import copy,logging,cmath,math
+import copy,logging
+logging.basicConfig(level=logging.INFO)
 from src.go import Go
 from ai.xuan import Xuan
 

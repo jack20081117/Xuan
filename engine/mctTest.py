@@ -4,6 +4,7 @@ from src.go import Go
 from ai.xuan import Xuan
 from ai.mcts import MCTS
 import logging,os
+logging.basicConfig(level=logging.INFO)
 
 config=CONFIG
 gl['ai']=config['ai']
@@ -21,5 +22,5 @@ if __name__ == '__main__':
     color=1
     num=1
     mcts.analyze(goban=goban)
-    son=mcts.root.getSon()
+    son=mcts.rootNode.getChildren()
     logging.info('son :>> %s'%son)
