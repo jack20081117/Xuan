@@ -36,7 +36,7 @@ function greeting(){
     const cols=process.stdout.columns;
     let text=''
     if(cols>104) text='electron-vue';
-    else if(cols>76) text='electron-vue';
+    else if(cols>76) text='electron-|vue';
     else text=false;
     if(text){
         say(text,{
@@ -70,6 +70,8 @@ function startElectron(){
         '--inspect=5858',
         path.join(__dirname,'../dist/electron/main.js')
     ];
+
+    //detect yarn or npm and process commandline args accordingly
     if(process.env.npm_execpath.endsWith('yarn.js')){
         args=args.concat(process.argv.slice(3));
     } else if(process.env.npm_execpath.endsWith('npm-cli.js')){
@@ -112,7 +114,7 @@ function startMain(){
                 setTimeout(()=>{manualRestart=false},5000);
             }
 
-            resolve()
+            resolve();
         })
     })
 }
