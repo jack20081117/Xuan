@@ -1,8 +1,7 @@
 import hashlib,re
-
 from datetime import datetime
 
-def getEmptyBoard():
+def getEmptyBoard()->list:#返回19x19的空棋盘
     return [
         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -25,30 +24,30 @@ def getEmptyBoard():
         [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
     ]
 
-def getEmptyString():
+def getEmptyString()->dict:#返回空的棋串
     return {
         'black':{},
         'white':{},
         'num':19
     }
 
-def getFourDirect(x,y):
+def getFourDirect(x,y)->tuple:#返回点(x,y)上下左右四个点
     up={'x':x,'y':y+1}
     down={'x':x,'y':y-1}
     left={'x':x-1,'y':y}
     right={'x':x+1,'y':y}
     return up,down,left,right
 
-def getHash(data):
+def getHash(data)->str:#返回字符串的sha1值
     return hashlib.sha1(data.encode(encoding='UTF-8')).hexdigest()
 
-def getSgfInfo(data,target,default):
+def getSgfInfo(data,target,default)->str:#从sgf中找出有用的信息
     p=re.compile(r"{}\[(.*?)]".format(target),re.S)
     result=re.findall(p,data)
     if default=='':default='unknown'
     return default if not len(result) else result[0]
 
-def getDatetime():
+def getDatetime()->dict:#返回当前时间的三种形式
     timestamp=datetime.now()
     timestr=timestamp.strftime('%Y%m%d%H%M%S')
     timeformat=timestamp.strftime('%Y-%m-%d %H:%M:%S')
@@ -59,10 +58,10 @@ def getDatetime():
         'datestr':datestr
     }
 
-def loopFor2D(List:list):
+def loopFor2D(List:list[list]):#对一个二维数组(如棋盘)作处理
     return [item for subList in List for item in subList]
 
-def bless():
+def bless():#神兽保佑我的代码没有BUG!
     print('''
 
        ┌─┐       ┌─┐
@@ -85,6 +84,7 @@ def bless():
         └─┐  ┐  ┌───────┬──┐  ┌─┘
           │ ─┤ ─┤       │ ─┤ ─┤
           └──┴──┘       └──┴──┘
+    
     神兽保佑
     代码无BUG!
     ''')
