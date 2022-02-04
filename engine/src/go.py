@@ -5,11 +5,11 @@ import numpy,logging,json,copy
 logging.basicConfig(level=logging.DEBUG)
 
 class Go(object):
-    board=None#棋盘
-    string=None#棋串
+    board:list[list]=None#棋盘
+    string:dict=None#棋串
     robX=None#打劫点X
     robY=None#打劫点Y
-    isBlack=True#目前是谁在走子(默认黑先)
+    isBlack:bool=True#目前是谁在走子(默认黑先)
 
     def __init__(self):
         self.board=getEmptyBoard()
@@ -18,13 +18,13 @@ class Go(object):
         self.robY=None#当前打劫点的y坐标
         self.isBlack=True#当前是否为黑方执子
 
-    def setBoard(self,board):#直接通过已有的棋盘克隆新棋盘
+    def setBoard(self,board:list[list]):#直接通过已有的棋盘克隆新棋盘
         '''
         :param board:old board
         '''
         self.board=board
 
-    def getStringInfo(self,x,y):#返回(x,y)点所在的棋串编号
+    def getStringInfo(self,x:int,y:int)->int or bool:#返回(x,y)点所在的棋串编号
         '''
         :return:the number of the string where (x,y) is located
         '''
@@ -45,12 +45,12 @@ class Go(object):
         return True
 
     @staticmethod
-    def getSrcString(*args):
+    def getSrcString(*args)->int:
         for s in args:
             if s>0 and not isinstance(s,bool):
                 return s
 
-    def combineCurrentString(self,x,y,src,*args):#将(x,y)与四周的点所在棋串进行合并
+    def combineCurrentString(self,x:int,y:int,src:int,*args):#将(x,y)与四周的点所在棋串进行合并
         logging.debug("combine current string 处理前 string:",self.string)
         subString=self.string['black'] if self.isBlack else self.string['white']
         if x not in subString:
@@ -69,7 +69,7 @@ class Go(object):
                     logging.debug("即将删除棋串%s"%subString[s])
                     del subString[s]
 
-    def combine(self,x,y,isBlack=None):
+    def combine(self,x:int,y:int,isBlack=None):
         if isBlack is not None:self.isBlack=isBlack
         up,down,left,right=getFourDirect(x,y)
 
@@ -101,13 +101,13 @@ class Go(object):
             logging.debug('combine result:%s'%self.string)
         return None
 
-    def doStep(self,x,y):#落子在(x,y)
+    def doStep(self,x:int,y:int):#落子在(x,y)
         if x<0 or x>18 or y<0 or y>18:
             logging.debug('x,y must be in [0,18]!')
         num=1 if self.isBlack else -1
         self.board[x][y]=num
 
-    def checkStep(self,x,y):#检查(x,y)是否已有棋子
+    def checkStep(self,x:int,y:int)->bool:#检查(x,y)是否已有棋子
         if x<0 or x>18 or y<0 or y>18:
             logging.debug('x,y must be in [0,18]!')
         if self.board[x][y]:
@@ -115,7 +115,7 @@ class Go(object):
             return False
         return True
 
-    def doKill(self,x,y,flag):
+    def doKill(self,x:int,y:int,flag:int)->list[int]:
         logging.debug('kill string:%s'%self.string)
         directs=getFourDirect(x,y)
         killed=[]
@@ -127,7 +127,7 @@ class Go(object):
                         killed.append(res)
         return killed
 
-    def checkKill(self,x,y,flag):
+    def checkKill(self,x:int,y:int,flag:int)->int or bool:
         color='black' if flag==1 else 'white'
         subString=self.string[color]
         num=subString[x][y]
@@ -148,26 +148,27 @@ class Go(object):
         logging.debug('棋串%d为死棋'%num)
         return num
 
-    def cleanString(self,num):#把编号为num的棋串从棋盘上删除
+    def cleanString(self,num:int)->list[dict]:#把编号为num的棋串从棋盘上删除
         logging.debug('clean string 正在删除棋串:%d'%num)
         if num in self.string['black']: color='black'
         elif num in self.string['white']: color='white'
         else: return []
         killed=[]
         subString=self.string[color]
-        L=subString[num]
+        L:list[dict]=subString[num]
         if L is None:
             logging.debug('棋串%d已被杀死'%num)
             return []
         for i in range(len(L)):
-            x,y=L[i]['x'],L[i]['y']
+            x:int=L[i]['x']
+            y:int=L[i]['y']
             self.board[x][y]=0#将棋串中所有棋子标记为0
             if y in subString[x]:
                 subString[x].pop(y)
                 killed.append({'x':x,'y':y})
         return killed
 
-    def checkSuicide(self,x,y):
+    def checkSuicide(self,x:int,y:int):
         color='black' if self.board[x][y]==1 else 'white'
         subString=self.string[color]
         num=subString[x][y]
@@ -180,7 +181,7 @@ class Go(object):
         subString[x].pop(y)
 
     @staticmethod
-    def transferBoard(board,src,target):
+    def transferBoard(board:list[list],src:int,target:int)->list[list]:
         '''
         :param board:the old board
         :param src:the source color,like -1
@@ -193,7 +194,7 @@ class Go(object):
                     board[i][j]=target
         return board
 
-    def transferSgf2StringAndBoard(self,sgfData):
+    def transferSgf2StringAndBoard(self,sgfData:str):
         self.__init__()
         data=self.parseSgf2Goban(sgfData)
         for i in range(len(data)):
@@ -204,7 +205,7 @@ class Go(object):
         logging.debug('board->%s'%self.board)
         logging.debug('string->%s'%self.string)
 
-    def transferBoard2String(self,board):
+    def transferBoard2String(self,board:list[list])->dict:
         self.__init__()
         string=None
         for i in range(19):
@@ -216,8 +217,8 @@ class Go(object):
         return string
 
     @staticmethod
-    def findBlank(board,cell):
-        def _findBlank(board,result,cell):
+    def findBlank(board,cell:tuple)->dict:
+        def _findBlank(board,result:dict,cell:tuple):
             i,j=cell
             board[i,j]=9
             result['cross'].add(cell)
@@ -254,15 +255,15 @@ class Go(object):
         _findBlank(board,result,cell)
         return result
 
-    def findBlanks(self,board):
+    def findBlanks(self,board)->list[dict]:
         blanks=[]
         while True:
             cells=numpy.where(board==0)
             if not cells[0].size: break
-            blanks.append(self.findBlank(board,(cells[0][0],cells[1][0])))
+            blanks.append(self.findBlank(board=board,cell=(cells[0][0],cells[1][0])))
         return blanks
 
-    def checkWinner(self,board):
+    def checkWinner(self,board)->dict:
         logging.debug('checking winner...')
         board=self.transferBoard(board,-1,2)
         npBoard=numpy.copy(board)
@@ -323,7 +324,7 @@ class Go(object):
         }
 
     @staticmethod
-    def parseGoban2Sgf(gobanData)->dict:#把Xuan能识别的棋谱信息(Goban)保存成方便入库的信息(Sgf)
+    def parseGoban2Sgf(gobanData:list[dict])->dict:#把Xuan能识别的棋谱信息(Goban)保存成方便入库的信息(Sgf)
         sgf=''
         for i in range(len(gobanData)):
             x=ALPHABET[int(gobanData[i]['x'])+1]#Sgf的x,y坐标为a-s,对应1-19,查询时需要加1
@@ -336,7 +337,7 @@ class Go(object):
             'sgf':sgf
         }
 
-    def parseSingleData(self,data):#解析数据集传来的Sgf
+    def parseSingleData(self,data:dict)->tuple[list,list,list,list]:#解析数据集传来的Sgf
         sgf=data['sgf']
         if isinstance(sgf,tuple):sgf=sgf[0]
         #每次清除围棋类的数据,很重要
@@ -366,11 +367,11 @@ class Go(object):
         winner=[WINNER[winner]]
         return goban,winner,parsedSgf,stringList
 
-    def parseSgf2NetworkData(self,sgf):#把单个sgf转为神经网络需要的数据
+    def parseSgf2NetworkData(self,sgf:str)->tuple[list,list,list,list]:#把单个sgf转为神经网络需要的数据
         sgfDict={'sgf':sgf}
         return self.parseSingleData(sgfDict)
 
-    def simpleGoLogic(self,x,y,color):
+    def simpleGoLogic(self,x:int,y:int,color:int):
         #Xuan内部使用的围棋逻辑,即把传进来的坐标转为自己的棋盘信息
         #不需要判断自身死棋或者打劫 因为传进来的棋谱默认合法
         self.isBlack=True if color=='black' else False
@@ -384,10 +385,10 @@ class Go(object):
             for i in range(len(killResult)):
                 self.cleanString(killResult[i])
 
-    def returnData(self,success):
+    def returnData(self,success:bool)->tuple:
         return success,self.board,self.string,self.robX,self.robY
 
-    def GoLogic(self,x,y,color):#完整的围棋逻辑
+    def GoLogic(self,x:int,y:int,color:int)->tuple:#完整的围棋逻辑
         #先做好备份 防止出现要类似悔棋的逻辑
         backupBoard=copy.deepcopy(self.board)
         backupString=copy.deepcopy(self.string)
@@ -395,7 +396,7 @@ class Go(object):
         checkStep=self.checkStep(x,y)#检查(x,y)是否已有棋子
         if not checkStep:
             logging.debug('GoLogic校验失败!')
-            return self.returnData(False)
+            return self.returnData(success=False)
         #判断自杀逻辑是反过来的
         if color=='black':
             self.isBlack=True
@@ -421,7 +422,7 @@ class Go(object):
                         logging.debug('GoLogic校验失败!')
                         self.board=backupBoard
                         self.string=backupString
-                        return self.returnData(False)
+                        return self.returnData(success=False)
                     #如果之前不是打劫点,则更新打劫点
                     self.robX=killed[0]['x']
                     self.robY=killed[0]['y']
@@ -439,11 +440,11 @@ class Go(object):
                 self.robY=backupRobY
                 logging.debug('不能在导致自己死棋的位置落子!')
                 logging.debug('GoLogic校验失败!')
-                return self.returnData(False)
+                return self.returnData(success=False)
         logging.debug('GoLogic校验成功!')
-        return self.returnData(True)
+        return self.returnData(success=True)
 
-    def getLastBoard(self,boardList,index,myColor,oppoColor):#获取最近的7步棋
+    def getLastBoard(self,boardList:list[list[list]],index:int,myColor:int,oppoColor:int)->tuple:#获取最近的7步棋
         myLast7Boards=[]
         oppoLast7Boards=[]
         start=index-7
@@ -454,20 +455,20 @@ class Go(object):
                 oppoLast7Boards.append(emptyBoard)
             else:
                 currentBoard=boardList[start]
-                myBoard=self.setBoardByColor(copy.deepcopy(currentBoard),myColor)
-                oppoBoard=self.setBoardByColor(copy.deepcopy(currentBoard),oppoColor)
+                myBoard=self.setBoardByColor(board=copy.deepcopy(currentBoard),color=myColor)
+                oppoBoard=self.setBoardByColor(board=copy.deepcopy(currentBoard),color=oppoColor)
                 myLast7Boards.append(myBoard)
                 oppoLast7Boards.append(oppoBoard)
             start+=1
         return myLast7Boards,oppoLast7Boards
 
     @staticmethod
-    def getDotLife(x,y,board):#获取棋盘上某个点是否为空
+    def getDotLife(x:int,y:int,board:list[list])->int:#获取棋盘上某个点是否为空
         if x<0 or x>18 or y<0 or y>18:
             return 0
         return 1 if not board[x][y] else 0
 
-    def getStringLife(self,board,L,threshold=4):#获取这个棋串有多少气,大于threshold就返回-1,不需要讨论
+    def getStringLife(self,board:list[list],L:list[dict],threshold=4)->int:#获取这个棋串有多少气,大于等于threshold就返回-1,不需要讨论
         life=0
         for i in range(len(L)):
             x,y=L[i]['x'],L[i]['y']
@@ -477,7 +478,7 @@ class Go(object):
                 if life>=threshold:return -1
         return life
 
-    def getBoardAddition(self,board,string,color)->tuple:#获取当前局面额外的信息
+    def getBoardAddition(self,board:list[list],string:dict,color:int)->tuple:#获取当前局面额外的信息
         myBoard=copy.deepcopy(board)
         oppoBoard=copy.deepcopy(board)
         myLifeBoard=[getEmptyBoard(),getEmptyBoard(),getEmptyBoard()]
@@ -521,15 +522,15 @@ class Go(object):
         return myBoard,oppoBoard,myLifeBoard,oppoLifeBoard
 
     @staticmethod
-    def setBoardByArray(board,array,color):#根据传入的参数更新棋盘
+    def setBoardByArray(board:list[list],array:list[dict],color:int):#根据传入的参数更新棋盘
         for i in range(len(array)):
-            x=array[i]['x']
-            y=array[i]['y']
+            x:int=array[i]['x']
+            y:int=array[i]['y']
             board[x][y]=color
         return board
 
     @staticmethod
-    def setBoardByColor(board,color):#让棋盘只留下某个颜色
+    def setBoardByColor(board:list[list],color:int)->list[list]:#让棋盘只留下某个颜色
         for i in range(19):
             for j in range(19):
                 if board[i][j]!=color:
@@ -537,14 +538,14 @@ class Go(object):
         return board
 
     @staticmethod
-    def getColorNumByText(text):#传入颜色文字转数字
+    def getColorNumByText(text:str)->int:#传入颜色文字转数字
         return 1 if text=='black' else 0
 
     @staticmethod
-    def getColorTextByNum(num):#传入颜色数字转文字
+    def getColorTextByNum(num:int)->str:#传入颜色数字转文字
         return 'black' if int(num)==1 else 'white'
 
-    def getCurrentColorBoard(self,num):#当前是黑色,就全1,否则全0
+    def getCurrentColorBoard(self,num:int)->list[list]:#当前是黑色,就全1,否则全0
         board=getEmptyBoard()
         for i in range(19):
             for j in range(19):
@@ -552,7 +553,7 @@ class Go(object):
         return board
 
     @staticmethod
-    def getMyOppoBoard(board,mycolor,oppocolor):#获取自己和对手的棋盘,数字全是1
+    def getMyOppoBoard(board:list[list],mycolor:int,oppocolor:int)->tuple:#获取自己和对手的棋盘,数字全是1
         myboard=copy.deepcopy(board)
         oppoboard=copy.deepcopy(board)
         for i in range(19):
@@ -562,9 +563,9 @@ class Go(object):
         return myboard,oppoboard
 
     @staticmethod
-    def reverseColor(color):#转换颜色
+    def reverseColor(color:int)->int:#转换颜色
         return -1 if color==1 else 1
 
     @staticmethod
-    def reverseColorText(text):
+    def reverseColorText(text:str)->str:
         return 'white' if text=='black' else 'black'
