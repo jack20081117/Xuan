@@ -10,9 +10,9 @@ from config import *
 DEVICE=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 config=CONFIG
 EPOCH=config['ai']['EPOCH']
-NEPOCH=3
-BATCHSIZETRAIN=100
-BATCHSIZETEST=1000
+N_EPOCH=3
+BATCH_SIZE_TRAIN=100
+BATCH_SIZE_TEST=1000
 
 MOMENTUM=0.5
 LR=0.01
@@ -41,7 +41,7 @@ class CNN(Module):
         x=functional.log_softmax(x,dim=1)
         return x
 
-def train(model,device,trainLoader,optimizer,epoch):
+def train(model,device,trainLoader,optimizer,epoch):#训练函数
     logging.info("开始训练")
     model.train()
     for batchIdx,(data,target) in enumerate(trainLoader):
@@ -56,7 +56,7 @@ def train(model,device,trainLoader,optimizer,epoch):
                          .format(epoch,batchIdx*len(data),len(trainLoader.dataset),
                          100.*batchIdx/len(trainLoader),loss.item()))
 
-def test(model,device,testLoader):
+def test(model,device,testLoader):#测试函数
     model.eval()
     testLoss=0
     correct=0
@@ -65,8 +65,8 @@ def test(model,device,testLoader):
             data,target=data.to(device),target.to(device)
             output=model(data)
 
-            testLoss+=functional.nll_loss(output,target,reduction='sum')  # 将一批的损失相加
-            pred=output.max(1,keepdim=True)[1]  # 找到概率最大的下标
+            testLoss+=functional.nll_loss(output,target,reduction='sum')#将一批的损失相加
+            pred=output.max(1,keepdim=True)[1]#找到概率最大的下标
             correct+=pred.eq(target.view_as(pred)).sum().item()
     testLoss/=len(testLoader.dataset)
     logging.info("\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%) \n"
@@ -78,13 +78,13 @@ if __name__ == '__main__':
                                                       transform=torchvision.transforms.Compose([
                                                           torchvision.transforms.ToTensor(),
                                                           torchvision.transforms.Normalize((0.1307,),(0.3081,))
-                                                      ])),batch_size=BATCHSIZETRAIN,shuffle=True)
+                                                      ])),batch_size=BATCH_SIZE_TRAIN,shuffle=True)
     testLoader=DataLoader(torchvision.datasets.MNIST('./mnist/',train=False,download=False,
                                                       transform=torchvision.transforms.Compose([
                                                           torchvision.transforms.ToTensor(),
                                                           torchvision.transforms.Normalize((0.1307,),(0.3081,))
-                                                      ])),batch_size=BATCHSIZETEST,shuffle=True)
-    
+                                                      ])),batch_size=BATCH_SIZE_TEST,shuffle=True)
+
     examples=enumerate(testLoader)
     batchIdx,(exampleData,exampleTargets)=next(examples)
     network=CNN()
@@ -96,5 +96,5 @@ if __name__ == '__main__':
     testLosses=[]
 
     for epoch in range(1,EPOCH+1):
-        train(model,DEVICE,trainLoader,optimizer,epoch)
-        test(model,DEVICE,testLoader)
+        train(model=model,device=DEVICE,trainLoader=trainLoader,optimizer=optimizer,epoch=epoch)
+        test(model=model,device=DEVICE,testLoader=testLoader)
