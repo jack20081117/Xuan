@@ -110,6 +110,7 @@ class Go(object):
     def checkStep(self,x:int,y:int)->bool:#检查(x,y)是否已有棋子
         if x<0 or x>18 or y<0 or y>18:
             logging.debug('x,y must be in [0,18]!')
+            return False
         if self.board[x][y]:
             logging.debug('不能在已有棋子的位置落子!')
             return False
@@ -118,7 +119,7 @@ class Go(object):
     def doKill(self,x:int,y:int,flag:int)->list[int]:
         logging.debug('kill string:%s'%self.string)
         directs=getFourDirect(x,y)
-        killed=[]
+        killed:list[int]=[]
         for direct in directs:
             if 0<=direct['x']<19 and 0<=direct['y']<19:
                 if self.board[direct['x']][direct['y']]==flag:
@@ -128,7 +129,7 @@ class Go(object):
         return killed
 
     def checkKill(self,x:int,y:int,flag:int)->int or bool:
-        color='black' if flag==1 else 'white'
+        color:str='black' if flag==1 else 'white'
         subString=self.string[color]
         num=subString[x][y]
         logging.debug('check kill 检查的棋串为:%d'%num)
@@ -153,7 +154,7 @@ class Go(object):
         if num in self.string['black']: color='black'
         elif num in self.string['white']: color='white'
         else: return []
-        killed=[]
+        killed:list[dict]=[]
         subString=self.string[color]
         L:list[dict]=subString[num]
         if L is None:
@@ -371,7 +372,7 @@ class Go(object):
         sgfDict={'sgf':sgf}
         return self.parseSingleData(sgfDict)
 
-    def simpleGoLogic(self,x:int,y:int,color:int):
+    def simpleGoLogic(self,x:int,y:int,color:str):
         #Xuan内部使用的围棋逻辑,即把传进来的坐标转为自己的棋盘信息
         #不需要判断自身死棋或者打劫 因为传进来的棋谱默认合法
         self.isBlack=True if color=='black' else False
@@ -388,7 +389,7 @@ class Go(object):
     def returnData(self,success:bool)->tuple:
         return success,self.board,self.string,self.robX,self.robY
 
-    def GoLogic(self,x:int,y:int,color:int)->tuple:#完整的围棋逻辑
+    def GoLogic(self,x:int,y:int,color:str)->tuple:#完整的围棋逻辑
         #先做好备份 防止出现要类似悔棋的逻辑
         backupBoard=copy.deepcopy(self.board)
         backupString=copy.deepcopy(self.string)
