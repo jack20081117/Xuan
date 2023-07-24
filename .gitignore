@@ -1,18 +1,10 @@
 .idea
 .vscode
-engine/savedModel/*
-engine/dataSet/*
-engine/mnist/*
-front/node_modules
-front/dist/electron/*
-front/dist/web/*
-front/static
-front/build/*
-!front/build/icons
+savedModel/*
+dataSet/*
+mnist/*
 
 !README.md
 !.gitkeep
-
-package-lock.json
 
 *.py[cod]
