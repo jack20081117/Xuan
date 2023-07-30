@@ -1,6 +1,6 @@
 #本文件检查Go()中判断目数的机制
 
-import numpy
+import numpy as np
 
 def findBlank(board,cell):
     def _findBlank(board,result,cell):
@@ -43,14 +43,14 @@ def findBlank(board,cell):
 def findBlanks(board):
     blanks=[]
     while True:
-        cells=numpy.where(board==0)
+        cells=np.where(board==0)
         if not cells[0].size: break
         blanks.append(findBlank(board,(cells[0][0],cells[1][0])))
     return blanks
 
 def checkWinner(board):
-    temp=numpy.copy(board)
-    for item in findBlanks(numpy.copy(board)):
+    temp=np.copy(board)
+    for item in findBlanks(np.copy(board)):
         if not len(item['w_around']) and not len(item['b_around']):
             value=9
         elif not len(item['w_around']):
@@ -70,27 +70,7 @@ def checkWinner(board):
     return black,white,common
 
 if __name__ == '__main__':
-    board=numpy.array([
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    ],dtype=numpy.ubyte)
+    board=np.zeros([19,19],dtype=np.int32)
     black,white,common=checkWinner(board)
     print('--------------------------------------')
     print('black:%d,white:%d,common:%d'%(black,white,common))

@@ -2,7 +2,7 @@ import sqlite3
 
 if __name__ == '__main__':
     file=input('FILE:')
-    conn=sqlite3.connect('./dataSet/'+file)
+    conn=sqlite3.connect('./dataset/'+file)
     cursor=conn.cursor()
     cursor.execute('''
     CREATE TABLE "goData"

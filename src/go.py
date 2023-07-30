@@ -1,8 +1,7 @@
-from src.tools import *
+from src.utils import *
 from config import *
 
 import numpy,logging,json,copy
-logging.basicConfig(level=logging.DEBUG)
 
 class Go(object):
 

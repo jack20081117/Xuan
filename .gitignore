@@ -1,7 +1,7 @@
 .idea
 .vscode
-savedModel/*
-dataSet/*
+saved_model/*
+dataset/*
 mnist/*
 
 !README.md

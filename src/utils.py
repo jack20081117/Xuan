@@ -2,7 +2,7 @@ import hashlib,re,numpy as np
 from datetime import datetime
 
 def getEmptyBoard():#返回19x19的空棋盘
-    return np.zeros([19,19])
+    return np.zeros([19,19],dtype=np.int32)
 
 def getEmptyString()->dict:#返回空的棋串
     return {

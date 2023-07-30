@@ -1,6 +1,5 @@
 import os,logging;logging.basicConfig(level=logging.INFO)
-from src.net import Server
-from src.tools import *
+from src.utils import *
 from config import GLOBAL_DICT as gl
 from config import *
 
@@ -27,24 +26,15 @@ if __name__ == '__main__':
     old=os.path.join(dbpath,config['db'].get('old',None))
     current=os.path.join(dbpath,config['db'].get('current',None))
     ai=os.path.join(dbpath,config['db'].get('ai',None))
-    Jack=os.path.join(dbpath,config['db'].get('Jack',None))
+    Tom=os.path.join(dbpath,config['db'].get('Tom',None))
 
     model={
         'old':old,
         'current':current,
         'ai':ai,
-        'Jack':Jack
+        'Tom':Tom
     }
 
     gl['model']=model
     gl['ai']=config['ai']
     gl['modelPath']=config['model']
-
-    if port is None:
-        logging.warning('缺少端口号!')
-        exit(1)
-
-    hello()
-
-    net=Server()
-    net.run(port)

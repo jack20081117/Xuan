@@ -1,4 +1,4 @@
-import configparser
+import configparser,os
 
 ALPHABET={
     'a':1,'b':2,'c':3,'d':4,'e':5,
@@ -34,7 +34,25 @@ WINNER={
 
 GLOBAL_DICT={}
 
-CONFIGFILEPATH='./config.ini'
+dbpath=os.path.dirname(os.path.realpath(__file__))
+CONFIGFILEPATH=os.path.join(dbpath,'config.ini')
 
 CONFIG=configparser.ConfigParser()
 CONFIG.read(CONFIGFILEPATH,encoding='utf-8')
+
+GLOBAL_DICT['logpath']=dbpath
+old=os.path.join(dbpath,CONFIG['db'].get('old',None))
+current=os.path.join(dbpath,CONFIG['db'].get('current',None))
+ai=os.path.join(dbpath,CONFIG['db'].get('ai',None))
+Tom=os.path.join(dbpath,CONFIG['db'].get('Tom',None))
+
+model={
+    'old':old,
+    'current':current,
+    'ai':ai,
+    'Tom':Tom
+}
+
+GLOBAL_DICT['model']=model
+GLOBAL_DICT['ai']=CONFIG['ai']
+GLOBAL_DICT['modelPath']=CONFIG['model']

@@ -1,17 +1,15 @@
 from database.db import Database
 from database.sql import *
-from src.tools import *
+from src.utils import *
 from config import GLOBAL_DICT as gl
 import hashlib,sqlite3,logging
 
 class DataCenter(object):
     database=None
-    databasePath=None
     model=None
 
     def __init__(self):
         self.database=Database()
-        self.databasePath=gl.get('dbpath',None)
         self.model=gl.get('model',None)
 
     def getGoban(self):
@@ -67,5 +65,8 @@ class DataCenter(object):
     def getAllDataSet(self):
         result=[]
         result.extend(self.getModelByName('current'))
+        result.extend(self.getModelByName('old'))
+        result.extend(self.getModelByName('Tom'))
+        result.extend(self.getModelByName('ai'))
         logging.info('总计%d条数据'%len(result))
         return result
