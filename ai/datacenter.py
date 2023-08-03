@@ -65,8 +65,8 @@ class DataCenter(object):
     def getAllDataSet(self):
         result=[]
         result.extend(self.getModelByName('current'))
-        result.extend(self.getModelByName('old'))
-        result.extend(self.getModelByName('Tom'))
-        result.extend(self.getModelByName('ai'))
+        # result.extend(self.getModelByName('old'))
+        # result.extend(self.getModelByName('Tom'))
+        # result.extend(self.getModelByName('ai'))
         logging.info('总计%d条数据'%len(result))
         return result

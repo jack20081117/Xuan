@@ -12,7 +12,7 @@ class Go(object):
         self.robY=None#当前打劫点的y坐标
         self.isBlack=True#当前是否为黑方执子
 
-    def setBoard(self,board:list[list]):#直接通过已有的棋盘克隆新棋盘
+    def setBoard(self,board):#直接通过已有的棋盘克隆新棋盘
         '''
         :param board:old board
         '''
@@ -59,7 +59,7 @@ class Go(object):
                 if s in subString:
                     subString[src].extend(subString[s])#合并棋串
                     for key in subString:
-                        if key<19:#key<19说明key是x坐标而不是棋串编号
+                        if key<BOARD_LENGTH:#key<BOARD_LENGTH说明key是x坐标而不是棋串编号
                             for subkey in subString[key]:#subkey是y坐标
                                 if subString[key][subkey]==s:#修改(key,subkey)点的对应棋串
                                     subString[key][subkey]=src
@@ -118,7 +118,7 @@ class Go(object):
         directs=getFourDirect(x,y)
         killed:list[int]=[]
         for direct in directs:
-            if 0<=direct['x']<19 and 0<=direct['y']<19:
+            if 0<=direct['x']<BOARD_LENGTH and 0<=direct['y']<BOARD_LENGTH:
                 if self.board[direct['x'],direct['y']]==flag:
                     res=self.checkKill(direct['x'],direct['y'],flag)
                     if res is not False:
@@ -138,7 +138,7 @@ class Go(object):
             directs=getFourDirect(x,y)
 
             for direct in directs:
-                if 0<=direct['x']<19 and 0<=direct['y']<19:
+                if 0<=direct['x']<BOARD_LENGTH and 0<=direct['y']<BOARD_LENGTH:
                     if not self.board[direct['x'],direct['y']]:#四周有点为空，则为活棋
                         logging.debug('棋串%d为活棋'%num)
                         return False
@@ -186,10 +186,7 @@ class Go(object):
         :param target:the target color like 2
         :return:the new board
         '''
-        for i in range(19):
-            for j in range(19):
-                if board[i,j]==src:
-                    board[i,j]=target
+        board[board==src]=target
         return board
 
     def transferSgf2StringAndBoard(self,sgfData:str):
@@ -206,8 +203,8 @@ class Go(object):
     def transferBoard2String(self,board)->dict:
         self.__init__()
         string=None
-        for i in range(19):
-            for j in range(19):
+        for i in range(BOARD_LENGTH):
+            for j in range(BOARD_LENGTH):
                 if board[i,j]:
                     self.isBlack=True if board[i,j]==1 else False
                     string=self.combine(i,j)
@@ -324,7 +321,7 @@ class Go(object):
     def parseGoban2Sgf(gobanData:list[dict])->dict:#把Xuan能识别的棋谱信息(Goban)保存成方便入库的信息(Sgf)
         sgf=''
         for i in range(len(gobanData)):
-            x=ALPHABET[int(gobanData[i]['x'])+1]#Sgf的x,y坐标为a-s,对应1-19,查询时需要加1
+            x=ALPHABET[int(gobanData[i]['x'])+1]#Sgf的x,y坐标为a-s,对应1-BOARD_LENGTH,查询时需要加1
             y=ALPHABET[int(gobanData[i]['y'])+1]
             color=COLOR_DICT[int(gobanData[i]['color'])]
             temp='%s[%s%s];'%(color,x,y)
@@ -488,8 +485,8 @@ class Go(object):
         else:
             myColorText='black'
             oppoColorText='white'
-        for i in range(19):
-            for j in range(19):
+        for i in range(BOARD_LENGTH):
+            for j in range(BOARD_LENGTH):
                 if board[i,j]!=color and board[i,j]: myBoard[i,j]=0#不是落子方也不是空
                 if board[i,j]==color: oppoBoard[i,j]=0#落子方
         myString=copy.deepcopy(string[myColorText])
@@ -497,7 +494,7 @@ class Go(object):
         myArray=[[],[],[]]
         oppoArray=[[],[],[]]
         for key in myString:
-            if int(key)<19: continue#不是棋串
+            if int(key)<BOARD_LENGTH: continue#不是棋串
             array=myString[key]
             life=self.getStringLife(board=board,L=array)
             if life==-1: continue#节约时间
@@ -505,7 +502,7 @@ class Go(object):
             if life==2: myArray[1].append(array)
             if life==3: myArray[2].append(array)
         for key in oppoString:
-            if int(key)<19: continue#不是棋串
+            if int(key)<BOARD_LENGTH: continue#不是棋串
             array=oppoString[key]
             life=self.getStringLife(board=board,L=array)
             if life==-1: continue#节约时间
@@ -527,11 +524,8 @@ class Go(object):
         return board
 
     @staticmethod
-    def setBoardByColor(board,color:int)->list[list]:#让棋盘只留下某个颜色
-        for i in range(19):
-            for j in range(19):
-                if board[i,j]!=color:
-                    board[i,j]=0
+    def setBoardByColor(board,color:int):#让棋盘只留下某个颜色
+        board[board!=color]=0
         return board
 
     @staticmethod
@@ -542,10 +536,10 @@ class Go(object):
     def getColorTextByNum(num:int)->str:#传入颜色数字转文字
         return 'black' if int(num)==1 else 'white'
 
-    def getCurrentColorBoard(self,num:int)->list[list]:#当前是黑色,就全1,否则全0
+    def getCurrentColorBoard(self,num:int):#当前是黑色,就全1,否则全0
         board=getEmptyBoard()
-        for i in range(19):
-            for j in range(19):
+        for i in range(BOARD_LENGTH):
+            for j in range(BOARD_LENGTH):
                 board[i,j]=num
         return board
 
@@ -553,8 +547,8 @@ class Go(object):
     def getMyOppoBoard(board,mycolor:int,oppocolor:int)->tuple:#获取自己和对手的棋盘,数字全是1
         myboard=copy.deepcopy(board)
         oppoboard=copy.deepcopy(board)
-        for i in range(19):
-            for j in range(19):
+        for i in range(BOARD_LENGTH):
+            for j in range(BOARD_LENGTH):
                 myboard[i,j]=1 if myboard[i,j]==mycolor else 0
                 oppoboard[i,j]=1 if oppoboard[i,j]==oppocolor else 0
         return myboard,oppoboard
